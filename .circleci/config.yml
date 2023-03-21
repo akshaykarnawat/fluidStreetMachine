@@ -16,6 +16,8 @@ jobs:
       - run: |
           echo In a container which has aws cli. This will allow for commands to be executed in the aws cloud;
           aws --version;
+          aws s3 ls --profile ${AWS_PROFILE};
+          aws s3 ls;
           ls -la;
           make data;
 
