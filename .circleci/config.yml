@@ -8,12 +8,14 @@ jobs:
     steps:
       - run: echo "hello world" # run the `echo` command
   fetch-code-and-run:
-    machine: 
-      image: ubuntu-2204:2022.07.1
-    resource_class: medium
+    docker: 
+      image: cimg/aws:2023.03
+    resource_class: small
     steps:
       - checkout # check out the code in the project directory
       - run: |
+          echo In a container which has aws cli. This will allow for commands to be executed in the aws cloud.
+          aws --version;
           ls -la;
           make data;
 

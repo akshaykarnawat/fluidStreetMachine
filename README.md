@@ -1,6 +1,6 @@
 # fluidStreetMachine -- code structure
 
-``` bash
+``` text
 $ tree ./
 .
 |____databases/
