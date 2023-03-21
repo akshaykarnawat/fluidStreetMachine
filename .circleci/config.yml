@@ -17,14 +17,15 @@ jobs:
           ls -la;
           make data;
       - persist_to_workspace:
-        root: fsm
+          root: fsm
 
   deploy:
     executor: my-executor
     steps:
       - attach_workspace:
-          at: /opt/fsm
+          at: /opt/fsm/
       - run: |
+          ls -la /opt/fsm/
           aws --version;
           aws s3 ls;
           
