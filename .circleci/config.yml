@@ -1,22 +1,23 @@
 version: 2.1
 
 jobs:
-  hello:
+  fetch-code:
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
     steps:
-      - run: echo "hello world" # run the `echo` command
-  fetch-code-and-run:
+      - checkout # check out the code in the project directory
+      - run: |
+          echo "hello world" 
+          ls -la;
+          make data;
+
+  deploy:
     docker: 
       - image: cimg/aws:2023.03
     resource_class: small
     steps:
-      - checkout # check out the code in the project directory
       - run: |
-          ls -la;
-          make data;
-
           aws --version;
           aws s3 ls;
           
@@ -35,7 +36,11 @@ jobs:
 workflows:
   my-workflow:
     jobs:
-      - hello
-      - fetch-code-and-run:
+      - fetch-code
+      - hold:
+          type: approval
+          requires:
+            - fetch-code
+      - deploy:
           requires: 
-            - hello
+            - hold
