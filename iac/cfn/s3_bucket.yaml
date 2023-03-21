@@ -1,0 +1,58 @@
+Parameters:
+  ProjectName:
+    Type: String
+    Description: "Project name"
+  BucketName:
+    Type: String
+    Description: "Set a bucket name"
+  DataLayer:
+    Type: String
+    AllowedValues:
+      - Raw
+      - Curated
+    Description: "Select a data layer"
+  Environment:
+    Type: String
+    AllowedValues:
+      - Dev
+      - Uat
+      - Prod
+    Description: "Select an environment"
+
+Mappings:
+  EnvironmentToBucketSuffix:
+    Dev:
+      Suffix: "dev"
+    Uat:
+      Suffix: "uat"
+    Prod:
+      Suffix: "prod"
+  DataLayerToBucketSuffix:
+    Raw:
+      Suffix: "raw"
+    Curated:
+      Suffix: "curated"
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join [ '.', [
+          !Ref BucketName,
+          !FindInMap [
+            DataLayerToBucketSuffix,
+            !Ref DataLayer,
+            Suffix
+          ],
+          !FindInMap [
+            EnvironmentToBucketSuffix,
+            !Ref Environment,
+            Suffix
+          ],
+        ]
+      ]
+      Tags:
+        - Key: env
+          Value: !Ref Environment
+        - Key: proj
+          Value: !Ref ProjectName

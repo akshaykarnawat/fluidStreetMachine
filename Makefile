@@ -27,8 +27,9 @@ clean:
 	find . -type d -name "__pycache__" -delete
 
 ## Lint using flake8
-lint:
+lint: requirements
 	flake8 src
+	cfn-lint iac/cfn/**/*.yaml
 
 #################################################################################
 # PROJECT RULES                                                                 #

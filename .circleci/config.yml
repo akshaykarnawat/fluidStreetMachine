@@ -14,11 +14,22 @@ jobs:
     steps:
       - checkout # check out the code in the project directory
       - run: |
-          echo In a container which has aws cli. This will allow for commands to be executed in the aws cloud;
-          aws --version;
-          aws s3 ls;
           ls -la;
           make data;
+
+          aws --version;
+          aws s3 ls;
+          
+          echo Here are all the stacks:
+          aws cloudformation list-stacks;
+          
+          echo Creating a stack
+          aws cloudformation create-stack --stack-name myteststack \
+          --template-body file://iac/cfn/s3_bucket.yaml \
+          --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
+          ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
+          ParameterKey=DataLayer,ParameterValue=Raw \
+          ParameterKey=Environment,ParameterValue=Dev
 
 workflows:
   my-workflow:
