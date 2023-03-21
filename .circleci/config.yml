@@ -29,7 +29,8 @@ jobs:
           --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
           ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
           ParameterKey=DataLayer,ParameterValue=Raw \
-          ParameterKey=Environment,ParameterValue=Dev
+          ParameterKey=Environment,ParameterValue=Dev \
+          --region us-east-1
 
 workflows:
   my-workflow:
