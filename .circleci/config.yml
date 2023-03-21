@@ -1,0 +1,17 @@
+version: 2.1
+
+jobs:
+  hello-job:
+    machine:
+      image: ubuntu-2204:2022.07.1
+    resource_class: medium
+    steps:
+      - checkout # check out the code in the project directory
+      - run: |
+        echo "hello world" # run the `echo` command
+        ls -la
+
+workflows:
+  my-workflow:
+    jobs:
+      - hello-job
