@@ -5,7 +5,7 @@ executors:
     docker:
       - image: cimg/aws:2023.03
     resource_class: small
-    working_directory: /opt
+    working_directory: /tmp
 
 jobs:
   fetch-code:
@@ -16,7 +16,7 @@ jobs:
           echo "hello world" 
           ls -la;
           make data;
-          cp -R * /opt/fsm;
+          cp -R * /tmp/fsm;
       - persist_to_workspace:
           root: fsm
           paths:
@@ -26,9 +26,9 @@ jobs:
     executor: my-executor
     steps:
       - attach_workspace:
-          at: /opt/fsm/
+          at: /tmp/fsm/
       - run: |
-          ls -la /opt/fsm/
+          ls -la /tmp/fsm/
           aws --version;
           aws s3 ls;
           
