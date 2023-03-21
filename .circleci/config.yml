@@ -22,5 +22,5 @@ workflows:
     jobs:
       - hello
       - fetch-code-and-run:
-        requires: 
-          - hello
+          requires: 
+            - hello
