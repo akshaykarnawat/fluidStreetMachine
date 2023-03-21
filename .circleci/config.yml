@@ -13,7 +13,7 @@ jobs:
     resource_class: medium
     steps:
       - checkout # check out the code in the project directory
-      - run:
+      - run: |
           ls -la;
           make data;
 
