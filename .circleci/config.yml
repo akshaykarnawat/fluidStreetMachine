@@ -1,18 +1,26 @@
 version: 2.1
 
 jobs:
-  hello-job:
+  hello:
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
     steps:
+      - run: echo "hello world" # run the `echo` command
+  fetch-code-and-run:
+    machine: 
+      image: ubuntu-2204:2022.07.1
+    resource_class: medium
+    steps:
       - checkout # check out the code in the project directory
-      - run: |
-          echo "hello world" # run the `echo` command;
+      - run:
           ls -la;
           make data;
 
 workflows:
   my-workflow:
     jobs:
-      - hello-job
+      - hello
+      - fetch-code-and-run:
+        requires: 
+          - hello
