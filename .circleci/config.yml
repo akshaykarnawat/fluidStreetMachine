@@ -9,8 +9,6 @@ jobs:
       - checkout # check out the code in the project directory
       - run: |
           echo "hello world" 
-          ls -la;
-          make data;
 
   deploy:
     docker: 
@@ -19,6 +17,8 @@ jobs:
     steps:
       - checkout
       - run: |
+          ls -la;
+          make lint data;
           aws --version;
           aws s3 ls;
           
