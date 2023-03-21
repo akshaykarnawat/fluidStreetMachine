@@ -16,8 +16,11 @@ jobs:
           echo "hello world" 
           ls -la;
           make data;
+          cp -R * /opt/fsm;
       - persist_to_workspace:
           root: fsm
+          paths:
+            - ./
 
   deploy:
     executor: my-executor
