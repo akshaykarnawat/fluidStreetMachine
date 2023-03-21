@@ -10,11 +10,11 @@ jobs:
   fetch-code-and-run:
     docker: 
       image: cimg/aws:2023.03
-    resource_class: small
+    # resource_class: small
     steps:
       - checkout # check out the code in the project directory
       - run: |
-          echo In a container which has aws cli. This will allow for commands to be executed in the aws cloud.
+          echo In a container which has aws cli. This will allow for commands to be executed in the aws cloud;
           aws --version;
           ls -la;
           make data;
