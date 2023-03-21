@@ -1,34 +1,24 @@
 version: 2.1
 
-executors:
-  my-executor:
-    docker:
-      - image: cimg/aws:2023.03
-    resource_class: small
-    working_directory: /tmp
-
 jobs:
   fetch-code:
-    executor: my-executor
+    machine:
+      image: ubuntu-2204:2022.07.1
+    resource_class: medium
     steps:
       - checkout # check out the code in the project directory
       - run: |
           echo "hello world" 
           ls -la;
           make data;
-          cp -R * /tmp/fsm;
-      - persist_to_workspace:
-          root: fsm
-          paths:
-            - ./
 
   deploy:
-    executor: my-executor
+    docker: 
+      - image: cimg/aws:2023.03
+    resource_class: small
     steps:
-      - attach_workspace:
-          at: /tmp/fsm/
+      - checkout
       - run: |
-          ls -la /tmp/fsm/
           aws --version;
           aws s3 ls;
           
@@ -52,6 +42,6 @@ workflows:
           type: approval
           requires:
             - fetch-code
-      - deploy:
+      - run:
           requires: 
             - hold
