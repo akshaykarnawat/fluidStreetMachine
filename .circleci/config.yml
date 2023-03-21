@@ -23,7 +23,7 @@ jobs:
           echo Here are all the stacks:
           aws cloudformation list-stacks;
           
-          echo Creating a stack
+          echo Creating a stack --region us-east-1
           aws cloudformation create-stack --stack-name myteststack \
           --template-body file://iac/cfn/s3_bucket.yaml \
           --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
