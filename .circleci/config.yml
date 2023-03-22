@@ -78,9 +78,7 @@ workflows:
   my-workflow:
     jobs:
       - fetch-code
-      - build-code:
-        requires:
-            - fetch-code
+      - build-code
       - deploy-dev:
           filters:
             branches:
