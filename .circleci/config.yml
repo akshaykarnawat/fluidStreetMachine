@@ -139,7 +139,7 @@ workflows:
           filters:
             branches:
               only: 
-                - develop\/.*
+                - /^develop\/.*/
       - deploy-to-uat:
           type: approval
           requires:
@@ -150,7 +150,7 @@ workflows:
           filters:
             branches:
               only: 
-                - release\/.*
+                - /^release\/.*/
       - deploy-to-prod:
           type: approval
           requires:
