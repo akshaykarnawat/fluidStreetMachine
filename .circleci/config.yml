@@ -9,7 +9,7 @@ commands:
             echo Hey there! I am running some code which can use used again and again! 
 
 jobs:
-  fetch:
+  fetch-code:
     name: Checkout codebase
     machine:
       image: ubuntu-2204:2022.07.1
@@ -17,7 +17,7 @@ jobs:
     steps:
       - checkout # check out the code in the project directory
   
-  build:
+  build-code:
     name: Check code and perform static scans
     machine:
       image: ubuntu-2204:2022.07.1
@@ -77,16 +77,16 @@ jobs:
 workflows:
   my-workflow:
     jobs:
-      - fetch
-      - build:
+      - fetch-code
+      - build-code:
         requires:
-            - fetch
+            - fetch-code
       - deploy-dev:
           filters:
             branches:
               only: develop
           requires:
-              - build
+              - build-code
       - deploy-to-uat:
           type: approval
           requires:
