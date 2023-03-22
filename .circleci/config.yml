@@ -26,10 +26,10 @@ jobs:
     # resource_class: medium
     executor: my-executor
     steps:
-      - checkout # check out the code in the project directory
       - run: pwd; ls -la
-      # - run: mkdir -p code
-      - run: cp ./* ~/workspace
+      - checkout # check out the code in the project directory
+      - run: ls -la
+      # - run: cp ./* ~/workspace
       - persist_to_workspace:
           root: workspace
           paths:
@@ -44,8 +44,8 @@ jobs:
     executor: my-executor
     steps:
       - attach_workspace:
-          at: /workspace
-      - run: pwd; cd /workspace/; ls -la
+          at: ~/workspace
+      - run: pwd; cd ~/workspace/; ls -la
       - run_some_code
       - run: 
           name: clean, lint, and scan codebase
