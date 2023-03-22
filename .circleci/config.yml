@@ -8,15 +8,14 @@ executors:
     working_directory: ~/workspace
 
 commands:
-  run_some_code:
+  get_schema_change_repo:
     steps:
       - run:
-          name: Running some code
+          name: Getting schemachange repo
           command: | 
-            echo hi
-            #git clone https://github.com/Snowflake-Labs/schemachange.git
-            #pip install -r schemachange/requirements.txt
-            #python schemachange/cli.py -h
+            git clone https://github.com/Snowflake-Labs/schemachange.git
+            pip install -r schemachange/requirements.txt
+            python schemachange/cli.py -h
 
 jobs:
   fetch-code:
@@ -26,10 +25,9 @@ jobs:
     # resource_class: medium
     executor: my-executor
     steps:
-      - run: pwd; ls -la
       - checkout # check out the code in the project directory
+      - get_schema_change_repo
       - run: pwd; ls -la
-      # - run: cp ./* ~/workspace
       - persist_to_workspace:
           root: ./
           paths:
@@ -46,7 +44,6 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: pwd; cd ~/workspace/; ls -la
-      - run_some_code
       - run: 
           name: clean, lint, and scan codebase
           command: echo "clean, lint, and performing static scans against the codebase" # check out the code in the project directory
@@ -63,7 +60,6 @@ jobs:
     resource_class: small
     steps:
       - checkout
-      - run_some_code
       - run: echo deploying the codebase to the dev env
       # - run: |
       #     ls -la;
