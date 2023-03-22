@@ -31,7 +31,7 @@ commands:
           name: getting schemachange repo
           command: | 
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            python3 -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
+            python3 -m pip -U install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
             # python3 -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
             ls -la schemachange
             python3 schemachange/schemachange/cli.py -h
@@ -88,6 +88,8 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
+      - run: pwd; ls -la
+      - run: pip freeze
       - run: echo deploying the codebase to the dev env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=externalbrowser \
