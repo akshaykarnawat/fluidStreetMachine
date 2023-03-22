@@ -21,8 +21,8 @@ commands:
       - run:
           name: create a virual environment
           command: |
-            pip install --upgrade pip
-            python -m pip install --user virtualenv
+            python3 -m pip install --upgrade pip
+            python3 -m pip install --user virtualenv
             virtualenv venv
             source venv/bin/activate
   get_schema_change_repo:
@@ -31,8 +31,8 @@ commands:
           name: getting schemachange repo
           command: | 
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            python -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
-            # python -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
+            python3 -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
+            # python3 -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
             ls -la schemachange
             python schemachange/schemachange/cli.py -h
 
