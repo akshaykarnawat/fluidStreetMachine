@@ -21,8 +21,8 @@ commands:
       - run:
           name: create a virual environment
           command: |
-            python3 -m pip install --upgrade pip
-            python3 -m pip install --user virtualenv
+            pip3 install --upgrade pip
+            pip3 install --user virtualenv
             virtualenv venv
             source venv/bin/activate
   get_schema_change_repo:
@@ -31,8 +31,8 @@ commands:
           name: getting schemachange repo
           command: | 
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            python3 -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
-            # python3 -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
+            pip3 install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
+            # pip3 install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
             ls -la schemachange
             python3 schemachange/schemachange/cli.py -h
 
@@ -49,7 +49,7 @@ jobs:
       - create_virtual_env
       - get_schema_change_repo
       - run: pwd; ls -la
-      - run: pip freeze >> packages_installed.txt | tee -a
+      - run: pip3 freeze >> packages_installed.txt | tee -a
       # - save_cache:
       #     key: deps-{{ checksum "packages_installed.txt" }}
       #     paths: 
@@ -90,7 +90,9 @@ jobs:
       - run: pwd; ls -la; ls -la venv; ls -la venv/bin
       - run: source venv/bin/activate
       - run: pwd; ls -la
-      - run: pip freeze
+      - run: pip3 freeze >> in_here.txt 
+      - run: diff in_here.txt packages_installed.txt
+      - run: pip3 install snowflake-connector-python 
       - run: echo deploying the codebase to the dev env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=externalbrowser \
