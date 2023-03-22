@@ -28,7 +28,7 @@ jobs:
     steps:
       - run: pwd; ls -la
       - checkout # check out the code in the project directory
-      - run: ls -la
+      - run: pwd; ls -la
       # - run: cp ./* ~/workspace
       - persist_to_workspace:
           root: workspace
