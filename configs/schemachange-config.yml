@@ -26,8 +26,8 @@ change-history-table: DEV_2179025_DEV_DB.RAW.CHANGE_HISTORY
 
 # Define values for the variables to replaced in change scripts
 vars:
-  var1: 'value1'
-  var2: 'value2'
+  DB: 'DEV_2179025_DEV_DB'
+  SCHEMA: 'RAW'
   secrets:
     var3: 'value3' # This is considered a secret and will not be displayed in any output
 

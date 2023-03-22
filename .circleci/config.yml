@@ -1,5 +1,12 @@
 version: 2.1
 
+executors:
+  my-executor:
+    machine:
+      image: ubuntu-2204:2022.07.1
+    resource_class: small
+    working_directory: /tmp
+
 commands:
   run_some_code:
     steps:
@@ -14,18 +21,31 @@ commands:
 jobs:
   fetch-code:
     description: Checkout codebase
-    machine:
-      image: ubuntu-2204:2022.07.1
-    resource_class: medium
+    # machine:
+    #   image: ubuntu-2204:2022.07.1
+    # resource_class: medium
+    executor: my-executor
     steps:
       - checkout # check out the code in the project directory
+      - run: pwd; ls -la
+      - run: mkdir -p workspace
+      - run: cp ./* workspace
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - ./
+
   
   build-code:
     description: building the codebase and running through the test cases
-    machine:
-      image: ubuntu-2204:2022.07.1
-    resource_class: medium
+    # machine:
+    #   image: ubuntu-2204:2022.07.1
+    # resource_class: medium
+    executor: my-executor
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: pwd; cd /tmp/workspace/; ls -la
       - run_some_code
       - run: 
           name: clean, lint, and scan codebase
