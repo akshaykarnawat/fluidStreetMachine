@@ -5,7 +5,7 @@ executors:
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
-    working_directory: /workspace
+    working_directory: ~/workspace
 
 commands:
   run_some_code:
@@ -29,7 +29,7 @@ jobs:
       - checkout # check out the code in the project directory
       - run: pwd; ls -la
       # - run: mkdir -p code
-      - run: cp ./* /workspace
+      - run: cp ./* ~/workspace
       - persist_to_workspace:
           root: workspace
           paths:
