@@ -15,7 +15,10 @@ commands:
     steps:
       - run:
           name: create a virual environment
-          command: echo test
+          command: |
+            python -m pip install --user virtualenv
+            virtualenv venv
+            source venv/bin/activate
 
 jobs:
   fetch-code:
@@ -33,9 +36,10 @@ jobs:
             # sudo apt-get update
             # sudo apt-get install python3.11
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            # pip install --upgrade pip
-            # pip install --no-cache-dir -r schemachange/requirements.txt
-            ls -la
+            pip install --upgrade pip
+            pip install -U pip setuptools wheel
+            pip install --no-cache-dir -r schemachange/requirements.txt
+            ls -la schemachange
             python schemachange/schemachange/cli.py -h
       - run: pwd; ls -la
       - persist_to_workspace:
