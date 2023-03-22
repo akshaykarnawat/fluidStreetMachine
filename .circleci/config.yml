@@ -137,7 +137,7 @@ workflows:
               - build-code
           filters:
             branches:
-              only: develop-.*
+              only: develop/.*
       - deploy-to-uat:
           type: approval
           requires:
@@ -147,7 +147,7 @@ workflows:
             - deploy-to-uat
           filters:
             branches:
-              only: release-.*
+              only: release/.*
       - deploy-to-prod:
           type: approval
           requires:
