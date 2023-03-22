@@ -91,7 +91,7 @@ jobs:
       - run: pip3 install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
       - run: echo deploying the codebase to the dev env
       - run: |
-            SNOWFLAKE_AUTHENTICATOR=https://mckinsey.okta.com \
+            SNOWFLAKE_AUTHENTICATOR=snowflake \
             python3 schemachange/schemachange/cli.py \
             -f ./databases/snowflake/migrations \
             -a ${SNOWFLAKE_ACCOUNT} \

@@ -7,27 +7,37 @@ root-folder: './databases/snowflake/migrations'
 modules-folder: null
 
 # The name of the snowflake account (e.g. xy12345.east-us-2.azure)
-snowflake-account: 'qfb61636.us-east-1'
+# snowflake-account: 'qfb61636.us-east-1'
+snowflake-account: 'fsb33346.prod3.us-west-2.aws'
+
 
 # The name of the snowflake user
-snowflake-user: 'AKSHAY_KARNAWAT@MCKINSEY.COM'
+# snowflake-user: 'AKSHAY_KARNAWAT@MCKINSEY.COM'
+snowflake-user: 'akshay'
 
 # The name of the default role to use. Can be overrideen in the change scripts.
-snowflake-role: 'DEV_2179025_DEV_CONTRIBUTOR_ROLE'
+# snowflake-role: 'DEV_2179025_DEV_CONTRIBUTOR_ROLE'
+snowflake-role: 'DEV_ROLE'
 
 # The name of the default warehouse to use. Can be overridden in the change scripts.
-snowflake-warehouse: 'DEV_2179025_DEV_CONTRIBUTOR_WH'
+# snowflake-warehouse: 'DEV_2179025_DEV_CONTRIBUTOR_WH'
+snowflake-warehouse: 'DEV_WH'
 
 # The name of the default database to use. Can be overridden in the change scripts.
-snowflake-database: null
+snowflake-database: DEV_2179025_DEV_DB
+snowflake-database: DEV
 
 # Used to override the default name of the change history table (the default is METADATA.SCHEMACHANGE.CHANGE_HISTORY)
-change-history-table: DEV_2179025_DEV_DB.RAW.CHANGE_HISTORY
+# change-history-table: DEV_2179025_DEV_DB.RAW.CHANGE_HISTORY
+change-history-table: DEV.DATA.CHANGE_HISTORY
 
 # Define values for the variables to replaced in change scripts
+# vars:
+  # DB: 'DEV_2179025_DEV_DB'
+  # SCHEMA: 'RAW'
 vars:
-  DB: 'DEV_2179025_DEV_DB'
-  SCHEMA: 'RAW'
+  DB: 'DEV'
+  SCHEMA: 'DATA'
   secrets:
     var3: 'value3' # This is considered a secret and will not be displayed in any output
 
