@@ -16,15 +16,13 @@ commands:
           command: |
             sudo apt-get update
             sudo apt-get install python3.11
-            alias python=python3
-            alias pip=pip3
   create_virtual_env:
     steps:
       - run:
           name: create a virual environment
           command: |
-            python -m pip install --upgrade pip
-            python -m pip install --user virtualenv
+            python3 -m pip install --upgrade pip
+            python3 -m pip install --user virtualenv
             virtualenv venv
             source venv/bin/activate
   get_schema_change_repo:
@@ -33,10 +31,10 @@ commands:
           name: getting schemachange repo
           command: | 
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            python -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
-            # python -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
+            python3 -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
+            # python3 -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
             ls -la schemachange
-            python schemachange/schemachange/cli.py -h
+            python3 schemachange/schemachange/cli.py -h
 
 jobs:
   fetch-code:
@@ -87,7 +85,7 @@ jobs:
       - run: echo deploying the codebase to the dev env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=externalbrowser \
-            python schemachange/schemachange/cli.py \
+            python3 schemachange/schemachange/cli.py \
             -f ./databases/snowflake/migrations \
             -a ${SNOWFLAKE_ACCOUNT} \
             -u ${SNOWFLAKE_USER} \
