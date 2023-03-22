@@ -82,16 +82,18 @@ workflows:
           requires: 
               - fetch-code
       - deploy-dev:
+          requires:
+              - build-code
           filters:
             branches:
               only: develop
-          requires:
-              - build-code
       - deploy-to-uat:
           type: approval
           requires:
             - deploy-dev
       - deploy-uat:
+          requires:
+            - deploy-to-uat
           filters:
             branches:
               only: release
