@@ -3,11 +3,9 @@ version: 2.1
 executors:
   my-executor:
     docker:
-      - image: cimg/python:3.11.2
+      # - image: cimg/python:3.11.2
+      - image: cimg/aws:2023.03
     resource_class: medium
-    # machine:
-    #   image: ubuntu-2204:2022.07.1
-    # resource_class: medium
     working_directory: ~/workspace
 
 commands:
@@ -20,6 +18,18 @@ commands:
             python -m pip install --user virtualenv
             virtualenv venv
             source venv/bin/activate
+  get_schema_change_repo:
+    steps:
+      - run:
+          name: getting schemachange repo
+          command: | 
+            # sudo apt-get update
+            # sudo apt-get install python3.11
+            git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
+            python -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
+            # python -m pip install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
+            ls -la schemachange
+            python schemachange/schemachange/cli.py -h
 
 jobs:
   fetch-code:
@@ -31,23 +41,13 @@ jobs:
     steps:
       - checkout # check out the code in the project directory
       - create_virtual_env
-      - run:
-          name: Getting schemachange repo
-          command: | 
-            # sudo apt-get update
-            # sudo apt-get install python3.11
-            git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            python -m pip install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
-            # python -m pip install -r schemachange/requirements.txt
-            ls -la schemachange
-            python schemachange/schemachange/cli.py -h
+      - get_schema_change_repo
       - run: pwd; ls -la
       - persist_to_workspace:
           root: ./
           paths:
             - ./
 
-  
   build-code:
     description: building the codebase and running through the test cases
     # machine:
@@ -57,7 +57,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
-      - run: pwd; cd ~/workspace/; ls -la
+      - run: pwd; ls -la
       - run: 
           name: clean, lint, and scan codebase
           command: echo "clean, lint, and performing static scans against the codebase" # check out the code in the project directory
@@ -69,12 +69,27 @@ jobs:
           command: echo unit testing and code coverage of the build
 
   deploy-dev:
-    docker: 
-      - image: cimg/aws:2023.03
-    resource_class: small
+    # docker: 
+    #   - image: cimg/aws:2023.03
+    # resource_class: small
+    executor: my-executor
     steps:
-      - checkout
+      - attach_workspace:
+          at: ~/workspace
       - run: echo deploying the codebase to the dev env
+      - run: |
+            SNOWFLAKE_AUTHENTICATOR=externalbrowser \
+            python schemachange/schemachange/cli.py \
+            -f ./databases/snowflake/migrations \
+            -a ${SNOWFLAKE_ACCOUNT} \
+            -u ${SNOWFLAKE_USER} \
+            -r ${SNOWFLAKE_ROLE} \
+            -w ${SNOWFLAKE_WAREHOUSE} \
+            -d ${SNOWFLAKE_DATABASE} \
+            -c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
+            --query-tag DATA_ENGINEERING \
+            --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
+            -v
       # - run: |
       #     ls -la;
       #     make lint data;
@@ -117,9 +132,9 @@ workflows:
       - deploy-dev:
           requires:
               - build-code
-          filters:
-            branches:
-              only: develop
+          # filters:
+          #   branches:
+          #     only: develop
       - deploy-to-uat:
           type: approval
           requires:
