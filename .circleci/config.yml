@@ -37,8 +37,8 @@ jobs:
             # sudo apt-get update
             # sudo apt-get install python3.11
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            pip install jinja2
-            # pip install -r schemachange/requirements.txt
+            # pip install jinja2 requests
+            pip install -r schemachange/requirements.txt
             ls -la schemachange
             python schemachange/schemachange/cli.py -h
       - run: pwd; ls -la
