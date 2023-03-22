@@ -1,7 +1,4 @@
 
--- Set the database and schema context
-USE SCHEMA {{ DB }}.{{ SCHEMA }};
-
 CREATE OR REPLACE FILE FORMAT CSV_NO_HEADER
     TYPE='CSV'
     COMPRESSION = 'AUTO'

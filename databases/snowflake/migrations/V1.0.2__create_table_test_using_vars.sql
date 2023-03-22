@@ -5,7 +5,7 @@ USE SCHEMA {{ DB }}.{{ SCHEMA }};
 -- create a new test table
 CREATE OR REPLACE TABLE TEST 
 (
-    ID NUMBER
+     ID NUMBER
     ,NOTES VARCHAR
 );
 

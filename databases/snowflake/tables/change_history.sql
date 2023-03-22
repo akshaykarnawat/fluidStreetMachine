@@ -1,7 +1,4 @@
 
--- Set the database and schema context
-USE SCHEMA {{ DB }}.{{ SCHEMA }};
-
 CREATE TABLE IF NOT EXISTS CHANGE_HISTORY
 (
     VERSION VARCHAR
