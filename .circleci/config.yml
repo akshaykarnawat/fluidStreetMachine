@@ -143,7 +143,11 @@ workflows:
       - deploy-to-uat:
           type: approval
           requires:
-            - deploy-dev
+            - build-code
+          filters:
+            branches:
+              only: 
+                - /^release\/.*/
       - deploy-uat:
           requires:
             - deploy-to-uat
