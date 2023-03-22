@@ -49,11 +49,6 @@ jobs:
       - create_virtual_env
       - get_schema_change_repo
       - run: pwd; ls -la
-      - run: pip3 freeze >> packages_installed.txt | tee -a
-      # - save_cache:
-      #     key: deps-{{ checksum "packages_installed.txt" }}
-      #     paths: 
-      #       - ./
       - persist_to_workspace:
           root: ./
           paths:
@@ -61,9 +56,6 @@ jobs:
 
   build-code:
     description: building the codebase and running through the test cases
-    # machine:
-    #   image: ubuntu-2204:2022.07.1
-    # resource_class: medium
     executor: my-executor
     steps:
       - attach_workspace:
@@ -71,7 +63,7 @@ jobs:
       - run: pwd; ls -la
       - run: 
           name: clean, lint, and scan codebase
-          command: echo "clean, lint, and performing static scans against the codebase" # check out the code in the project directory
+          command: echo "clean, lint, and performing static scans against the codebase"
       - run:
           name: build codebase
           command: echo building the codebase
@@ -80,16 +72,13 @@ jobs:
           command: echo unit testing and code coverage of the build
 
   deploy-dev:
-    # docker: 
-    #   - image: cimg/aws:2023.03
-    # resource_class: small
     executor: my-executor
     steps:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
       - run: pip3 install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
-      - run: echo deploying the codebase to the dev env
+      - run: echo deploying the codebase to the dev snowflake env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=snowflake \
             python3 schemachange/schemachange/cli.py \
@@ -103,23 +92,24 @@ jobs:
             --query-tag DATA_ENGINEERING \
             --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
             -v
-      # - run: |
-      #     ls -la;
-      #     make lint data;
-      #     aws --version;
-      #     aws s3 ls;
+      - run: echo deploying the codebase to the dev aws dev env using cloudformation
+      - run: |
+          ls -la;
+          make lint data;
+          aws --version;
+          aws s3 ls;
           
-      #     echo Here are all the stacks:
-      #     aws cloudformation list-stacks;
+          echo Here are all the stacks:
+          aws cloudformation list-stacks;
           
-      #     echo Creating a stack --region us-east-1
-      #     aws cloudformation create-stack --stack-name myteststack \
-      #     --template-body file://iac/cfn/s3_bucket.yaml \
-      #     --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
-      #     ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
-      #     ParameterKey=DataLayer,ParameterValue=Raw \
-      #     ParameterKey=Environment,ParameterValue=Dev \
-      #     --region us-east-1
+          echo Creating a stack --region us-east-1
+          aws cloudformation create-stack --stack-name myteststack \
+          --template-body file://iac/cfn/s3_bucket.yaml \
+          --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
+          ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
+          ParameterKey=DataLayer,ParameterValue=Raw \
+          ParameterKey=Environment,ParameterValue=Dev \
+          --region us-east-1
 
   deploy-uat:
     docker: 
@@ -145,9 +135,9 @@ workflows:
       - deploy-dev:
           requires:
               - build-code
-          # filters:
-          #   branches:
-          #     only: develop
+          filters:
+            branches:
+              only: develop/.*
       - deploy-to-uat:
           type: approval
           requires:
@@ -157,7 +147,7 @@ workflows:
             - deploy-to-uat
           filters:
             branches:
-              only: release
+              only: release/.*
       - deploy-to-prod:
           type: approval
           requires:
