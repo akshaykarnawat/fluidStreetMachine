@@ -45,6 +45,7 @@ jobs:
     executor: my-executor
     steps:
       - checkout # check out the code in the project directory
+      - install_python
       - create_virtual_env
       - get_schema_change_repo
       - run: pwd; ls -la
