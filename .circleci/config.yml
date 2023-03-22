@@ -31,7 +31,7 @@ jobs:
       - run: pwd; ls -la
       # - run: cp ./* ~/workspace
       - persist_to_workspace:
-          root: workspace
+          root: ./
           paths:
             - ./
 
