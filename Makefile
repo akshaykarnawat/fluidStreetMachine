@@ -31,6 +31,27 @@ lint: requirements
 	flake8 src
 	cfn-lint iac/cfn/**/*.yaml
 
+## Run the schemachange
+schemachange:
+	# git clone schemachange
+	# pip install the requirements file
+	#
+	# one way -- using the config file
+	# SNOWFLAKE_AUTHENTICATOR=externalbrowser $(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py --config-folder ./configs -v
+	# another way
+	SNOWFLAKE_AUTHENTICATOR=externalbrowser \
+	$(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py \
+	-f ./databases/snowflake/migrations \
+	-a ${SNOWFLAKE_ACCOUNT} \
+	-u ${SNOWFLAKE_USER} \
+	-r ${SNOWFLAKE_ROLE} \
+	-w ${SNOWFLAKE_WAREHOUSE} \
+	-d ${SNOWFLAKE_DATABASE} \
+	-c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
+	--query-tag DATA_ENGINEERING \
+	--vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
+	-v
+
 #################################################################################
 # PROJECT RULES                                                                 #
 #################################################################################

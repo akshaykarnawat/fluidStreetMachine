@@ -1,9 +1,10 @@
 -- Set the database and schema context
-USE SCHEMA DEV_2179025_DEV_DB.RAW;
+USE SCHEMA {{ DB }}.{{ SCHEMA }};
 
 -- Load the trips data
 COPY INTO TRIPS FROM @TRIPS
-    FILE_FORMAT = (FORMAT_NAME = 'CSV_NO_HEADER');
+    FILE_FORMAT = (FORMAT_NAME = 'CSV_NO_HEADER')
+    PATTERN='.*.csv.gz';
 
 -- Load the weather data
 COPY INTO WEATHER FROM

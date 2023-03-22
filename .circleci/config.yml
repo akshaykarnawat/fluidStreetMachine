@@ -6,7 +6,10 @@ commands:
       - run:
           name: Running some code
           command: | 
-            echo Hey there! I am running some code which can use used again and again! 
+            echo hi
+            #git clone https://github.com/Snowflake-Labs/schemachange.git
+            #pip install -r schemachange/requirements.txt
+            #python schemachange/cli.py -h
 
 jobs:
   fetch-code:

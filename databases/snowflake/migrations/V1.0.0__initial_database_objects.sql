@@ -1,8 +1,8 @@
 -- Create the database if it doesn't exist
--- CREATE DATABASE IF NOT EXISTS SCHEMACHANGE_DEMO;
+-- CREATE DATABASE IF NOT EXISTS {{ DB }};
 
 -- Set the database and schema context
-USE SCHEMA DEV_2179025_DEV_DB.RAW;
+USE SCHEMA {{ DB }}.{{ SCHEMA }};
 
 -- Create the file formats
 CREATE OR REPLACE FILE FORMAT CSV_NO_HEADER
