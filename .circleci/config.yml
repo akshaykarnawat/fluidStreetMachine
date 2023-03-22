@@ -10,7 +10,7 @@ commands:
 
 jobs:
   fetch-code:
-    name: Checkout codebase
+    description: Checkout codebase
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
@@ -18,7 +18,7 @@ jobs:
       - checkout # check out the code in the project directory
   
   build-code:
-    name: Check code and perform static scans
+  description: building the codebase and running through the test cases
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
