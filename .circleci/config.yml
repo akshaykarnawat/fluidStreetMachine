@@ -2,9 +2,12 @@ version: 2.1
 
 executors:
   my-executor:
-    docker:
-      - image: cimg/python:3.11.2
-    resource_class: small
+    # docker:
+    #   - image: cimg/python:3.11.2
+    # resource_class: small
+    machine:
+      image: ubuntu-2204:2022.07.1
+    resource_class: medium
     working_directory: ~/workspace
 
 commands:
@@ -13,9 +16,11 @@ commands:
       - run:
           name: Getting schemachange repo
           command: | 
-            # git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            # pip install --no-cache-dir -r schemachange/requirements.txt
-            # python schemachange/cli.py -h
+            sudo apt-get update
+            sudo apt-get install python3.11
+            git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
+            pip3 install --no-cache-dir -r schemachange/requirements.txt
+            python3 schemachange/cli.py -h
 
 jobs:
   fetch-code:
