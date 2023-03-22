@@ -87,12 +87,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
-      - run: pwd; ls -la; ls -la venv; ls -la venv/bin
       - run: source venv/bin/activate
-      - run: pwd; ls -la
-      # - run: pip3 freeze >> in_here.txt 
-      # - run: diff in_here.txt packages_installed.txt
-      - run: pip3 install snowflake-connector-python 
+      - run: pip3 install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
       - run: echo deploying the codebase to the dev env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=externalbrowser \
