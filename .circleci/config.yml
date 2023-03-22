@@ -126,6 +126,7 @@ jobs:
       - run: echo deploying the codebase to the prod env
 
 workflows:
+  version: 2
   my-workflow:
     jobs:
       - fetch-code
@@ -138,7 +139,7 @@ workflows:
           filters:
             branches:
               only: 
-                - develop/.*
+                - develop\/.*
       - deploy-to-uat:
           type: approval
           requires:
@@ -149,7 +150,7 @@ workflows:
           filters:
             branches:
               only: 
-                - release/.*
+                - release\/.*
       - deploy-to-prod:
           type: approval
           requires:
