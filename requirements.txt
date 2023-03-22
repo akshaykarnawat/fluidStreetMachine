@@ -1,4 +1,5 @@
 click
 flake8
 cfn-lint
+snowflake-connector-python
 
