@@ -1,47 +1,104 @@
 version: 2.1
 
+commands:
+  run_some_code:
+    steps:
+      - run:
+          name: Running some code
+          command: | 
+            echo Hey there! I am running some code which can use used again and again! 
+
 jobs:
-  fetch-code:
+  fetch:
+    name: Checkout codebase
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
     steps:
       - checkout # check out the code in the project directory
-      - run: |
-          echo "hello world" 
+  
+  build:
+    name: Check code and perform static scans
+    machine:
+      image: ubuntu-2204:2022.07.1
+    resource_class: medium
+    steps:
+      - run_some_code
+      - run: 
+          name: clean, lint, and scan codebase
+          command: echo "clean, lint, and performing static scans against the codebase" # check out the code in the project directory
+      - run:
+          name: build codebase
+          command: echo building the codebase
+      - run:
+          name: test codebase
+          command: echo unit testing and code coverage of the build
 
-  deploy:
+  deploy-dev:
     docker: 
       - image: cimg/aws:2023.03
     resource_class: small
     steps:
       - checkout
-      - run: |
-          ls -la;
-          make lint data;
-          aws --version;
-          aws s3 ls;
+      - run_some_code
+      - run: echo deploying the codebase to the dev env
+      # - run: |
+      #     ls -la;
+      #     make lint data;
+      #     aws --version;
+      #     aws s3 ls;
           
-          echo Here are all the stacks:
-          aws cloudformation list-stacks;
+      #     echo Here are all the stacks:
+      #     aws cloudformation list-stacks;
           
-          echo Creating a stack --region us-east-1
-          aws cloudformation create-stack --stack-name myteststack \
-          --template-body file://iac/cfn/s3_bucket.yaml \
-          --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
-          ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
-          ParameterKey=DataLayer,ParameterValue=Raw \
-          ParameterKey=Environment,ParameterValue=Dev \
-          --region us-east-1
+      #     echo Creating a stack --region us-east-1
+      #     aws cloudformation create-stack --stack-name myteststack \
+      #     --template-body file://iac/cfn/s3_bucket.yaml \
+      #     --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
+      #     ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
+      #     ParameterKey=DataLayer,ParameterValue=Raw \
+      #     ParameterKey=Environment,ParameterValue=Dev \
+      #     --region us-east-1
+
+  deploy-uat:
+    docker: 
+      - image: cimg/aws:2023.03
+    resource_class: small
+    steps:
+      - run: echo deploying the codebase to the uat env
+
+  deploy-prod:
+    docker: 
+      - image: cimg/aws:2023.03
+    resource_class: small
+    steps:
+      - run: echo deploying the codebase to the prod env
 
 workflows:
   my-workflow:
     jobs:
-      - fetch-code
-      - hold:
+      - fetch
+      - build:
+        requires:
+            - fetch
+      - deploy-dev:
+          filters:
+            branches:
+              only: develop
+          requires:
+              - build
+      - deploy-to-uat:
           type: approval
           requires:
-            - fetch-code
-      - deploy:
+            - deploy-dev
+      - deploy-uat:
+          filters:
+            branches:
+              only: release
+      - deploy-to-prod:
+          type: approval
+          requires:
+            - deploy-uat
+      - deploy-prod:
           requires: 
-            - hold
+            - deploy-to-prod
