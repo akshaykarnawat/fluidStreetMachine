@@ -49,6 +49,11 @@ jobs:
       - create_virtual_env
       - get_schema_change_repo
       - run: pwd; ls -la
+      # - run: pip freeze >> packages_installed.txt
+      # - save_cache:
+      #     key: deps-{{ checksum "packages_installed.txt" }}
+      #     paths: 
+      #       - ./
       - persist_to_workspace:
           root: ./
           paths:
@@ -82,6 +87,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/workspace
+      - run: source venv/bin/activate
       - run: echo deploying the codebase to the dev env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=externalbrowser \
