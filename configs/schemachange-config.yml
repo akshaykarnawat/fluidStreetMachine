@@ -24,7 +24,7 @@ snowflake-role: 'DEV_ROLE'
 snowflake-warehouse: 'DEV_WH'
 
 # The name of the default database to use. Can be overridden in the change scripts.
-snowflake-database: DEV_2179025_DEV_DB
+# snowflake-database: DEV_2179025_DEV_DB
 snowflake-database: DEV
 
 # Used to override the default name of the change history table (the default is METADATA.SCHEMACHANGE.CHANGE_HISTORY)
