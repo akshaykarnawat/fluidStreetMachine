@@ -18,7 +18,7 @@ jobs:
       - checkout # check out the code in the project directory
   
   build-code:
-  description: building the codebase and running through the test cases
+    description: building the codebase and running through the test cases
     machine:
       image: ubuntu-2204:2022.07.1
     resource_class: medium
