@@ -132,7 +132,7 @@ jobs:
               --region us-east-1
             fi
 
-            [[ $? == 0 ]] && aws s3 sync artifact.zip s3://circle-ci-test-990.raw.dev/
+            [[ $? == 0 ]] && aws s3 cp artifact.zip s3://circle-ci-test-990.raw.dev/
 
   deploy-uat:
     docker:
