@@ -115,7 +115,7 @@ jobs:
             aws s3 ls;
 
             echo Here are all the stacks:
-            aws cloudformation list-stacks;
+            aws cloudformation list-stacks --query "StackSummaries[].StackName";
 
             echo Creating a stack --region us-east-1
             aws cloudformation create-stack --stack-name myteststack \
@@ -126,7 +126,7 @@ jobs:
             ParameterKey=Environment,ParameterValue=Dev \
             --region us-east-1
 
-            [[ $? == 0 ]] && aws s3 sync ./artifact.zip s3://circle-ci-test-990
+            [[ $? == 0 ]] && aws s3 sync artifact.zip s3://circle-ci-test-990.raw.dev/
 
   deploy-uat:
     docker:
