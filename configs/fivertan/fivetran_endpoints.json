@@ -1,136 +1,136 @@
 {
-  "connector_status": {
+  "get_users": {
+    "method": "GET",
+    "url": "https://api.fivetran.com/v1/users",
     "headers": {
-      "Accept": "application/json;version=2",
       "Authorization": "Basic ${AUTH_TOKEN}",
-      "Content-Type": "application/json"
-    },
-    "method": "GET",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}"
-  },
-  "create_connector": {
-    "data": "${CONNECTOR_CONFIG}",
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}",
-      "Content-Type": "application/json"
-    },
-    "method": "POST",
-    "url": "https://api.fivetran.com/v1/connectors"
-  },
-  "create_destination": {
-    "data": "${DESTINATION_CONFIG}",
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}",
-      "Content-Type": "application/json"
-    },
-    "method": "POST",
-    "url": "https://api.fivetran.com/v1/destinations"
-  },
-  "delete_connector": {
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
-    "method": "DELETE",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}"
-  },
-  "destination_details": {
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
-    "method": "GET",
-    "url": "https://api.fivetran.com/v1/destinations/${DESTINATION_ID}"
-  },
-  "force_sync_connector": {
-    "data": {
-      "force": "true"
-    },
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}",
-      "Content-Type": "application/json"
-    },
-    "method": "POST",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}/sync"
-  },
-  "get_all_connectors": {
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
-    "method": "GET",
-    "url": "https://api.fivetran.com/v1/groups/${GROUP_ID}/connectors"
-  },
-  "get_connector_details": {
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
-    "method": "GET",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}"
-  },
-  "get_group_details": {
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
-    "method": "GET",
-    "url": "https://api.fivetran.com/v1/destinations/${GROUP_ID}"
+      "Accept": "application/json;version=2"
+    }
   },
   "get_groups": {
-    "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
     "method": "GET",
-    "url": "https://api.fivetran.com/v1/groups"
-  },
-  "get_users": {
+    "url": "https://api.fivetran.com/v1/groups",
     "headers": {
-      "Accept": "application/json;version=2",
-      "Authorization": "Basic ${AUTH_TOKEN}"
-    },
-    "method": "GET",
-    "url": "https://api.fivetran.com/v1/users"
-  },
-  "pause_connector": {
-    "data": {
-      "paused": "true"
-    },
-    "headers": {
-      "Accept": "application/json;version=2",
       "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2"
+    }
+  },
+  "get_group_details": {
+    "method": "GET",
+    "url": "https://api.fivetran.com/v1/destinations/${GROUP_ID}",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2"
+    }
+  },
+  "get_all_connectors": {
+    "method": "GET",
+    "url": "https://api.fivetran.com/v1/groups/${GROUP_ID}/connectors",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2"
+    }
+  },
+  "create_connector": {
+    "method": "POST",
+    "url": "https://api.fivetran.com/v1/connectors",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
       "Content-Type": "application/json"
     },
-    "method": "PATCH",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}"
+    "data": "${CONNECTOR_CONFIG}"
+  },
+  "get_connector_details": {
+    "method": "GET",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2"
+    }
   },
   "test_connector": {
+    "method": "POST",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}/test",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
+      "Content-Type": "application/json"
+    },
     "data": {
       "trust_certificates": "true",
       "trust_fingerprints": "true"
-    },
+    }
+  },
+  "pause_connector": {
+    "method": "PATCH",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}",
     "headers": {
-      "Accept": "application/json;version=2",
       "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
       "Content-Type": "application/json"
     },
-    "method": "POST",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}/test"
+    "data": {
+      "paused": "true"
+    }
   },
   "unpause_connector": {
-    "data": {
-      "paused": "false"
-    },
+    "method": "PATCH",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}",
     "headers": {
-      "Accept": "application/json;version=2",
       "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
       "Content-Type": "application/json"
     },
-    "method": "PATCH",
-    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}"
+    "data": {
+      "paused": "false"
+    }
+  },
+  "force_sync_connector": {
+    "method": "POST",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}/sync",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
+      "Content-Type": "application/json"
+    },
+    "data": {
+      "force": "true"
+    }
+  },
+  "connector_status": {
+    "method": "GET",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
+      "Content-Type": "application/json"
+    }
+  },
+  "delete_connector": {
+    "method": "DELETE",
+    "url": "https://api.fivetran.com/v1/connectors/${CONNECTOR_ID}",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2"
+    }
+  },
+  "create_destination": {
+    "method": "POST",
+    "url": "https://api.fivetran.com/v1/destinations",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2",
+      "Content-Type": "application/json"
+    },
+    "data": "${DESTINATION_CONFIG}"
+  },
+  "destination_details": {
+    "method": "GET",
+    "url": "https://api.fivetran.com/v1/destinations/${DESTINATION_ID}",
+    "headers": {
+      "Authorization": "Basic ${AUTH_TOKEN}",
+      "Accept": "application/json;version=2"
+    }
   }
 }
