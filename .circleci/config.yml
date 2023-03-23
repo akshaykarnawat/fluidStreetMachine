@@ -154,7 +154,7 @@ workflows:
                 - /^release\/.*/
       - deploy-uat:
           requires:
-            - deploy-to-uat
+            - deploy-to-uat?
           context:
             - FluidStreetMachineUat
           filters:
@@ -169,6 +169,6 @@ workflows:
             - deploy-uat
       - deploy-prod:
           requires: 
-            - deploy-to-prod
+            - deploy-to-prod?
           context:
             - FluidStreetMachineProd
