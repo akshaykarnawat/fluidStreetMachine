@@ -1,0 +1,21 @@
+{
+  "group_id": "${group_id}",
+  "service": "email",
+  "trust_certificates": true,
+  "trust_fingerprints": true,
+  "run_setup_tests": "${run_setup_tests}",
+  "paused": "${paused}",
+  "pause_after_trial": "${pause_after_trial}",
+  "sync_frequency": "${sync_frequency}",
+  "config": {
+    "schema": "${schema}",
+    "append_file_option": "${file_option}",
+    "external_id": "string",
+    "empty_header": false,
+    "file_type": "${file_type}",
+    "delimiter": "${delimiter}",
+    "on_error": "fail",
+    "compression": "${compression}",
+    "table": "${table}"
+  }
+}

@@ -5,7 +5,7 @@ executors:
     docker:
       # - image: cimg/python:3.11.2
       - image: cimg/aws:2023.03
-    resource_class: medium
+    resource_class: small
     working_directory: ~/workspace
 
 commands:
@@ -29,7 +29,7 @@ commands:
     steps:
       - run:
           name: getting schemachange repo
-          command: | 
+          command: |
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
             # pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
             # python3 schemachange/schemachange/cli.py -h
@@ -59,15 +59,22 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: pwd; ls -la
-      - run: 
-          name: clean, lint, and scan codebase
-          command: echo "clean, lint, and performing static scans against the codebase"
+      - run: source venv/bin/activate
       - run:
-          name: build codebase
-          command: echo building the codebase
+          name: installing requirements
+          command: pip3 install -r requirements.txt
+      - run:
+          name: clean, lint, and static scan codebase
+          command: pre-commit run --all-files
       - run:
           name: test codebase
           command: echo unit testing and code coverage of the build
+      - run:
+          name: build codebase
+          command: zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
+      - store_artifacts:
+          path: ./artifact.zip
+          destination: artifact
 
   deploy-dev:
     executor: my-executor
@@ -75,9 +82,13 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
-      - run: pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
+      - run:
+          name: installing schemachange requirements
+          command: pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
       - run: echo deploying the codebase to the dev snowflake env
-      - run: |
+      - run:
+          name: snowflake deployment
+          command: |
             SNOWFLAKE_AUTHENTICATOR=snowflake \
             python3 schemachange/schemachange/cli.py \
             -f ./databases/snowflake/migrations \
@@ -91,33 +102,37 @@ jobs:
             --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
             -v
       - run: echo deploying the codebase to the dev aws dev env using cloudformation
-      - run: |
-          ls -la;
-          make lint data;
-          aws --version;
-          aws s3 ls;
-          
-          echo Here are all the stacks:
-          aws cloudformation list-stacks;
-          
-          echo Creating a stack --region us-east-1
-          aws cloudformation create-stack --stack-name myteststack \
-          --template-body file://iac/cfn/s3_bucket.yaml \
-          --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
-          ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
-          ParameterKey=DataLayer,ParameterValue=Raw \
-          ParameterKey=Environment,ParameterValue=Dev \
-          --region us-east-1
+      - run:
+          name: AWS deployment
+          command: |
+            ls -la;
+            make lint data;
+            aws --version;
+            aws s3 ls;
+
+            echo Here are all the stacks:
+            aws cloudformation list-stacks;
+
+            echo Creating a stack --region us-east-1
+            aws cloudformation create-stack --stack-name myteststack \
+            --template-body file://iac/cfn/s3_bucket.yaml \
+            --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
+            ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
+            ParameterKey=DataLayer,ParameterValue=Raw \
+            ParameterKey=Environment,ParameterValue=Dev \
+            --region us-east-1
+
+            [[ $? == 0]] && aws s3 sync artifact.zip s3://circle-ci-test-990
 
   deploy-uat:
-    docker: 
+    docker:
       - image: cimg/aws:2023.03
     resource_class: small
     steps:
       - run: echo deploying the codebase to the uat env
 
   deploy-prod:
-    docker: 
+    docker:
       - image: cimg/aws:2023.03
     resource_class: small
     steps:
@@ -129,7 +144,7 @@ workflows:
     jobs:
       - fetch-code
       - build-code:
-          requires: 
+          requires:
               - fetch-code
 
       # deploy the build to dev
@@ -140,9 +155,9 @@ workflows:
             - FluidStreetMachineDev
           filters:
             branches:
-              only: 
+              only:
                 - /^develop\/.*/
-                
+
       # deploy the build to uat
       - deploy-to-uat?:
           type: approval
@@ -150,7 +165,7 @@ workflows:
             - build-code
           filters:
             branches:
-              only: 
+              only:
                 - /^release\/.*/
       - deploy-uat:
           requires:
@@ -159,7 +174,7 @@ workflows:
             - FluidStreetMachineUat
           filters:
             branches:
-              only: 
+              only:
                 - /^release\/.*/
 
       # deploy the build to prod
@@ -168,7 +183,7 @@ workflows:
           requires:
             - deploy-uat
       - deploy-prod:
-          requires: 
+          requires:
             - deploy-to-prod?
           context:
             - FluidStreetMachineProd
