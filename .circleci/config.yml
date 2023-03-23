@@ -115,10 +115,10 @@ jobs:
             aws s3 ls;
 
             echo Here are all the stacks:
-            aws cloudformation list-stacks --query "StackSummaries[].StackName";
+            aws cloudformation list-stacks --stack-status-filter "CREATE_COMPLETE" --query "StackSummaries[].StackName";
 
             # creating a stack if the stack does not exist already
-            stack = aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'myteststack')].StackName" --output text
+            stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'myteststack')].StackName" --output text)
             if [[ stack != "myteststack" ]]; then
               echo Creating a stack --region us-east-1
               aws cloudformation create-stack --stack-name myteststack \
