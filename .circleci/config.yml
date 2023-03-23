@@ -71,7 +71,7 @@ jobs:
           command: echo unit testing and code coverage of the build
       - run:
           name: build codebase
-          command: zip -r test.zip . -x ".git/*"
+          command: zip -r test.zip . -x ".git/*" -x "venv" -x "schemachange"
 
   deploy-dev:
     executor: my-executor
