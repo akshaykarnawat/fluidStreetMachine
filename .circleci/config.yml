@@ -5,7 +5,7 @@ executors:
     docker:
       # - image: cimg/python:3.11.2
       - image: cimg/aws:2023.03
-    resource_class: medium
+    resource_class: small
     working_directory: ~/workspace
 
 commands:
@@ -64,7 +64,7 @@ jobs:
           name: installing requirements
           command: pip3 install -r requirements.txt
       - run:
-          name: clean, lint, and scan codebase
+          name: clean, lint, and static scan codebase
           command: pre-commit run --all-files
       - run:
           name: test codebase
@@ -121,6 +121,8 @@ jobs:
             ParameterKey=DataLayer,ParameterValue=Raw \
             ParameterKey=Environment,ParameterValue=Dev \
             --region us-east-1
+
+            [[ $? == 0]] && aws s3 sync artifact.zip s3://circle-ci-test-990
 
   deploy-uat:
     docker:
