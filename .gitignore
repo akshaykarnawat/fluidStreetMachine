@@ -1,2 +1,4 @@
-configs/schemachange-config.yml
 run.txt
+.DS_STORE
+.env
+/logs

@@ -1,6 +1,8 @@
 click
 flake8
+pre-commit
 cfn-lint
+black
 Jinja2
 pandas
 PyYAML

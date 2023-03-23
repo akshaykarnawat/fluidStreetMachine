@@ -1,0 +1,20 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+        exclude: ^iac/cfn/
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: check-json
+    -   id: pretty-format-json
+        args: ['--autofix']
+-   repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+    -   id: black
+-   repo: https://github.com/aws-cloudformation/cfn-lint
+    rev: v0.74.1
+    hooks:
+        - id: cfn-lint
+          files: iac/cfn/.*\.(json|yml|yaml)$
