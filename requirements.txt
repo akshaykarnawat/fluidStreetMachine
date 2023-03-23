@@ -4,6 +4,7 @@ pre-commit
 cfn-lint
 black
 Jinja2
+numpy
 pandas
 PyYAML
 snowflake-connector-python

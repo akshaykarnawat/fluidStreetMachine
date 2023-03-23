@@ -17,10 +17,6 @@ requirements:
 	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
-## Make Dataset
-data: requirements
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py --input data/raw --output data/processed
-
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
@@ -31,14 +27,18 @@ lint: requirements
 	flake8 src
 	cfn-lint iac/cfn/**/*.yaml
 
-## Run the schemachange
-schemachange:
+## Make Dataset
+data: requirements
+	$(PYTHON_INTERPRETER) -m src.data.make_dataset --input demo/data/raw/attendance.csv --output demo/data/processed/attendance_final.csv
+
+## Run the schemachange library
+schemachange: requirements
 	# git clone schemachange
 	# pip install the requirements file
 	#
 	# one way -- using the config file
 	# SNOWFLAKE_AUTHENTICATOR=externalbrowser $(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py --config-folder ./configs -v
-	# another way
+	# another way -- using the command line arguments
 	SNOWFLAKE_AUTHENTICATOR=externalbrowser \
 	$(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py \
 	-f ./databases/snowflake/migrations \
