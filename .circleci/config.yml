@@ -118,7 +118,7 @@ jobs:
             aws cloudformation list-stacks --query "StackSummaries[].StackName";
 
             # creating a stack if the stack does not exist already
-            stack = aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'myteststack')].StackName --output text
+            stack = aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'myteststack')].StackName" --output text
             if [[ stack != "myteststack" ]]; then
               echo Creating a stack --region us-east-1
               aws cloudformation create-stack --stack-name myteststack \
