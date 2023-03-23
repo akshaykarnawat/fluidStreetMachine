@@ -71,7 +71,9 @@ jobs:
           command: echo unit testing and code coverage of the build
       - run:
           name: build codebase
-          command: zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
+          command: |
+            zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
+            chmod 755 artifact.zip
       - store_artifacts:
           path: ./artifact.zip
           destination: artifact
@@ -130,7 +132,7 @@ jobs:
               --region us-east-1
             fi
 
-            [[ $? == 0 ]] && aws s3 sync ./artifact.zip s3://circle-ci-test-990.raw.dev/
+            [[ $? == 0 ]] && aws s3 sync artifact.zip s3://circle-ci-test-990.raw.dev/
 
   deploy-uat:
     docker:
