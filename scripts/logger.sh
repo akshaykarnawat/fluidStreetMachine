@@ -20,7 +20,7 @@
 function logger::init() {
     local RUN_LOG_PATH="${1}"
     local CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
-    
+
     # create the log path directory
     mkdir -p ${RUN_LOG_PATH}
     chmod 775 ${RUN_LOG_PATH}

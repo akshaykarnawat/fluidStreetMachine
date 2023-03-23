@@ -49,7 +49,7 @@ function fivetran::usage() {
     with \`base64 AUTH_KEY:SECRET_TOKEN\`
 
     Examples:
-    [ Getting all users ] 
+    [ Getting all users ]
     bash ./fivetran.sh -e /full/path/to/endpoint/config/file.json -f "get_users"
 
     [ Getting groups ]
@@ -106,17 +106,17 @@ function fivetran::parse_arguments() {
 function fivetran::validate_arguments() {
     [[ -z ${ENDPOINT_CONFIG_PATH} ]] && \
     print_error "-e argument missing" && fivetran::usage
-    
+
     [[ -z ${FUNCTION} ]] && \
     print_error "-f argument missing" && fivetran::usage
-    
-    # if the function we are calling is create connector then make sure the 
+
+    # if the function we are calling is create connector then make sure the
     # connector config file is provided
     [[ ${FUNCTION} == create_connector ]] && \
     [[ -z ${CONNECTOR_CONFIG_PATH} ]] && \
     print_error "-s argument missing" && fivetran::usage
 
-    # if the function we are calling is create destination then make sure the 
+    # if the function we are calling is create destination then make sure the
     # destination config file is provided
     [[ ${FUNCTION} == create_destination ]] && \
     [[ -z ${DESTINATION_CONFIG_PATH} ]] && \
@@ -125,7 +125,7 @@ function fivetran::validate_arguments() {
 
 ###############################################################################
 # fivetran::parse_config
-# parse the config file 
+# parse the config file
 #
 # Arguments:
 #   config_file: config file path
@@ -139,7 +139,7 @@ function fivetran::parse_config() {
 
 ###############################################################################
 # fivetran::set_additional_arguments
-# set the additional arguments as variables which can be used in the script 
+# set the additional arguments as variables which can be used in the script
 ###############################################################################
 function fivetran::set_additional_arguments() {
     local args=($(echo ${ARGUMENTS}))
@@ -151,10 +151,10 @@ function fivetran::set_additional_arguments() {
 ###############################################################################
 # fivetran::search_json
 # search the json data string for the given key. Note: this is does not do a
-# recursive lookup. 
-# Note: If the json string is { "school" : "lindbergh", "students" : {...} } 
+# recursive lookup.
+# Note: If the json string is { "school" : "lindbergh", "students" : {...} }
 # and we search for school, the function will return value lindbergh.
-# 
+#
 # Arguments:
 #   data: json_data in which we need to search
 #   key: json key we need to search for
@@ -184,7 +184,7 @@ EOF
 ###############################################################################
 # fivetran::generate_headers
 # generate the curl command headers from the json headers dictionary
-# 
+#
 # Arguments:
 #   headers: json headers data
 # Returns:
@@ -201,7 +201,7 @@ function fivetran::generate_headers() {
 ###############################################################################
 # fivetran::call_api
 # call fivetran api with the required config
-# 
+#
 # Arguments:
 #   endpoint config key: the endpoint name to call
 # Returns:
@@ -210,7 +210,7 @@ function fivetran::generate_headers() {
 function fivetran::call_api() {
     local endpoint_key="${1}"
     local config=$(fivetran::search_json "${ENDPOINT_CONFIG}" ${endpoint_key})
-    
+
     # check to see if the config is available in endpoint config file
     [[ -z "${config}" ]] && \
     fail "Unable to find ${endpoint_key} in ${ENDPOINT_CONFIG_PATH}"
@@ -247,7 +247,7 @@ function fivetran::call_api() {
 # creates a fivetran connector
 ###############################################################################
 function fivetran::create_connector() {
-    
+
     local response=$(fivetran::call_api create_connector)
     local code=$(fivetran::search_json "${response}" code)
     local message=$(fivetran::search_json "${response}" message)
@@ -256,7 +256,7 @@ function fivetran::create_connector() {
     #echo $(python -c "import json; print(json.dumps(json.loads(r'${response}').get('data', {}), indent=2))")
 
     local data=$(fivetran::search_json "${response}" data)
-    [[ "${data}" == "" ]] && return 
+    [[ "${data}" == "" ]] && return
 
     local config=$(fivetran::search_json "${data}" config)
     echo "Connector ID: $(fivetran::search_json "${data}" id)" | tee -a ${RUN_LOG_FILE}

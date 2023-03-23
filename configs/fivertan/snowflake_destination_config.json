@@ -1,14 +1,14 @@
 {
-    "group_id": "${group_id}",
-    "service": "snowflake",
-    "region": "${region}",
-    "time_zone_offset": "-5",
-    "config": {
-      "host": "${snowflake_host}",
-      "port": 443,
-      "database": "${snowflake_database}",
-      "auth": "PASSWORD",
-      "user": "${snowflake_user}",
-      "password": "${snowflake_password}"
-    }
+  "config": {
+    "auth": "PASSWORD",
+    "database": "${snowflake_database}",
+    "host": "${snowflake_host}",
+    "password": "${snowflake_password}",
+    "port": 443,
+    "user": "${snowflake_user}"
+  },
+  "group_id": "${group_id}",
+  "region": "${region}",
+  "service": "snowflake",
+  "time_zone_offset": "-5"
 }

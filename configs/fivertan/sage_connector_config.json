@@ -1,16 +1,16 @@
 {
-    "group_id": "${group_id}",
-    "service": "sage_intacct",
-    "trust_certificates": true,
-    "trust_fingerprints": true,
-    "run_setup_tests": "${run_setup_tests}",
-    "paused": "${paused}",
-    "pause_after_trial": "${pause_after_trial}",
-    "sync_frequency": "${sync_frequency}",
-    "config": {
-      "schema": "${schema}",
-      "login_password": "${login_password}",
-      "user_i_d": "${user_i_d}",
-      "company_i_d": "${company_i_d}"
-    }
+  "config": {
+    "company_i_d": "${company_i_d}",
+    "login_password": "${login_password}",
+    "schema": "${schema}",
+    "user_i_d": "${user_i_d}"
+  },
+  "group_id": "${group_id}",
+  "pause_after_trial": "${pause_after_trial}",
+  "paused": "${paused}",
+  "run_setup_tests": "${run_setup_tests}",
+  "service": "sage_intacct",
+  "sync_frequency": "${sync_frequency}",
+  "trust_certificates": true,
+  "trust_fingerprints": true
 }
