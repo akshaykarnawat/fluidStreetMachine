@@ -31,10 +31,8 @@ commands:
           name: getting schemachange repo
           command: | 
             git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            pip3 install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
-            # pip3 install -r schemachange/requirements.txt # does not work.. have to remove the versions in the file
-            ls -la schemachange
-            python3 schemachange/schemachange/cli.py -h
+            # pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
+            # python3 schemachange/schemachange/cli.py -h
 
 jobs:
   fetch-code:
@@ -77,7 +75,7 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
-      - run: pip3 install numpy requests Jinja2 pandas PyYAML snowflake-connector-python
+      - run: pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
       - run: echo deploying the codebase to the dev snowflake env
       - run: |
             SNOWFLAKE_AUTHENTICATOR=snowflake \
@@ -133,14 +131,20 @@ workflows:
       - build-code:
           requires: 
               - fetch-code
+
+      # deploy the build to dev
       - deploy-dev:
           requires:
               - build-code
+          context:
+            - FluidStreetMachineDev
           filters:
             branches:
               only: 
                 - /^develop\/.*/
-      - deploy-to-uat:
+                
+      # deploy the build to uat
+      - deploy-to-uat?:
           type: approval
           requires:
             - build-code
@@ -150,15 +154,21 @@ workflows:
                 - /^release\/.*/
       - deploy-uat:
           requires:
-            - deploy-to-uat
+            - deploy-to-uat?
+          context:
+            - FluidStreetMachineUat
           filters:
             branches:
               only: 
                 - /^release\/.*/
-      - deploy-to-prod:
+
+      # deploy the build to prod
+      - deploy-to-prod?:
           type: approval
           requires:
             - deploy-uat
       - deploy-prod:
           requires: 
-            - deploy-to-prod
+            - deploy-to-prod?
+          context:
+            - FluidStreetMachineProd
