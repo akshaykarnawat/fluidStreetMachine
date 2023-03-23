@@ -119,7 +119,7 @@ jobs:
 
             # creating a stack if the stack does not exist already
             stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'myteststack')].StackName" --output text)
-            if [[ stack != "myteststack" ]]; then
+            if [[ ${stack} != "myteststack" ]]; then
               echo Creating a stack --region us-east-1
               aws cloudformation create-stack --stack-name myteststack \
               --template-body file://iac/cfn/s3_bucket.yaml \
