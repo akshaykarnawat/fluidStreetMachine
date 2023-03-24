@@ -33,10 +33,8 @@ commands:
       - run:
           name: create a virual environment
           command: |
-            # pip3 install --upgrade pip
-            # pip3 install --user virtualenv
-            pip install --upgrade pip
-            pip install --user virtualenv
+            pip3 install --upgrade pip
+            pip3 install --user virtualenv
             virtualenv venv
             source venv/bin/activate
   get_schema_change_repo:
@@ -51,10 +49,10 @@ jobs:
   fetch-code:
     description: Checkout codebase
     
-    executor: python-executor
+    executor: aws-cli-executor
     steps:
       - checkout # check out the code in the project directory
-      # - install_python
+      - install_python
       - create_virtual_env
       - get_schema_change_repo
       - run: pwd; ls -la
