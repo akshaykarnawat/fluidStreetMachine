@@ -27,7 +27,7 @@ function deploy() {
     get_all_stacks
 
     local layer="Raw"
-    local bucket_name=gen3-data-arch.${layer}.${ENVIRONMENT}
+    local bucket_name=gen3-data-arch.${layer,,}.${ENVIRONMENT,,}
     local stack_name=${PROJECT_NAME}-s3-bucket-${layer}-${ENVIRONMENT}
 
     # creating a stack if the stack does not exist already
@@ -36,7 +36,7 @@ function deploy() {
         aws cloudformation create-stack --stack-name ${stack_name} \
         --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
         --parameters ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-        ParameterKey=BucketName,ParameterValue=${bucket_name,,} \
+        ParameterKey=BucketName,ParameterValue=${bucket_name} \
         ParameterKey=DataLayer,ParameterValue=${layer} \
         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
