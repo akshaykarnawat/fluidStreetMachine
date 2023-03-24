@@ -154,10 +154,13 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
-      # - deploy_snowflake
+      # - deploy_snowflake:
+      #     snowflake_authenticator: snowflake
       # - deploy_aws
       # - deploy_matillion
       # - deploy_fivetran
+    environment:
+      ENV: Uat
 
   deploy-prod:
     description: Deploy to the PROD environment
@@ -166,10 +169,13 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
-      # - deploy_snowflake
+      # - deploy_snowflake:
+      #     snowflake_authenticator: snowflake
       # - deploy_aws
       # - deploy_matillion
       # - deploy_fivetran
+    environment:
+      ENV: Prod
 
 workflows:
   version: 2
@@ -186,10 +192,10 @@ workflows:
               - build-code
           context:
             - FluidStreetMachineDev
-          # filters:
-          #   branches:
-          #     only:
-          #       - /^develop\/.*/
+          filters:
+            branches:
+              only:
+                - /^develop\/.*/
 
       # deploy the build to uat
       - deploy-to-uat?:
