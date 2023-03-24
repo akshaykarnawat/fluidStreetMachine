@@ -1,12 +1,14 @@
 import click
 
 from src.common.utils.logger import logger
+from src.common.utils.timer import timer
 from src.data.example_etl import ETLExample
 
 
 @click.command()
 @click.option("--input", help="Input")
 @click.option("--output", help="Output")
+@timer
 def make_data(input, output):
     """
     Make data

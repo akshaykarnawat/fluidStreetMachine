@@ -27,6 +27,10 @@ lint: requirements
 	flake8 src
 	cfn-lint iac/cfn/**/*.yaml
 
+## Pre-commit hook
+pre-commit: requirements
+	pre-commit run --all-files
+
 ## Make Dataset
 data: requirements
 	$(PYTHON_INTERPRETER) -m src.data.make_dataset --input demo/data/raw/attendance.csv --output demo/data/processed/attendance_final.csv

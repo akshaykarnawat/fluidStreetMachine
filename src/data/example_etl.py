@@ -1,4 +1,3 @@
-
 import traceback
 
 from src.common.abstractions.abc_etl_factory import ETLFactory
@@ -32,13 +31,16 @@ class ETLExample(ETLFactory):
     def _transform(self, *args, **kwargs):
         # self.transformer.transform()
         i_help()
-        logger.info('transforming the data by removing some columns')
-        _ = [self.data.drop(col, axis=1, inplace=True) for col in kwargs.get('colsToDrop', [])]
+        logger.info("transforming the data by removing some columns")
+        _ = [
+            self.data.drop(col, axis=1, inplace=True)
+            for col in kwargs.get("colsToDrop", [])
+        ]
         return self
 
     def _load(self, *args, **kwargs):
         # load the data
-        kwargs['dataframe'] = self.data
+        kwargs["dataframe"] = self.data
         try:
             self.loader.load(*args, **kwargs)
         except Exception as e:
