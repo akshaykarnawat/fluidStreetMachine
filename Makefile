@@ -33,18 +33,19 @@ pre-commit: requirements
 
 ## Make Dataset
 data: requirements
-	$(PYTHON_INTERPRETER) -m src.data.make_dataset --input demo/data/raw/attendance.csv --output demo/data/processed/attendance_final.csv
+	$(PYTHON_INTERPRETER) -m src.data.make_dataset \
+	--input demo/data/raw/attendance.csv \
+	--output demo/data/processed/attendance_final.csv
 
 ## Run the schemachange plugin
-schemachange: requirements
-	# git clone schemachange
-	# pip install the requirements file
-	#
-	# one way -- using the config file
-	# SNOWFLAKE_AUTHENTICATOR=externalbrowser $(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py --config-folder ./configs -v
-	# another way -- using the command line arguments
-	SNOWFLAKE_AUTHENTICATOR=externalbrowser \
-	$(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py \
+schemachange:
+	$(PYTHON_INTERPRETER) -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
+	# specify the authentication method
+
+	# one way to run using the config file
+	# schemachange --config-folder ./configs -v
+
+	SNOWFLAKE_AUTHENTICATOR=externalbrowser schemachange \
 	-f ./databases/snowflake/migrations \
 	-a ${SNOWFLAKE_ACCOUNT} \
 	-u ${SNOWFLAKE_USER} \
@@ -52,6 +53,7 @@ schemachange: requirements
 	-w ${SNOWFLAKE_WAREHOUSE} \
 	-d ${SNOWFLAKE_DATABASE} \
 	-c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
+	--create-change-history-table \
 	--query-tag DATA_ENGINEERING \
 	--vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
 	-v

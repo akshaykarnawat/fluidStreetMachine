@@ -6,8 +6,8 @@ from src.data.example_etl import ETLExample
 
 
 @click.command()
-@click.option("--input", help="Input")
-@click.option("--output", help="Output")
+@click.option("--input", required=True, help="Input file")
+@click.option("--output", required=True, help="Output file")
 @timer
 def make_data(input, output):
     """

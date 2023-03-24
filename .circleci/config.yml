@@ -30,9 +30,9 @@ commands:
       - run:
           name: getting schemachange repo
           command: |
-            git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            # pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
-            # python3 schemachange/schemachange/cli.py -h
+            # git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
+            python3 -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
+            python3 schemachange -h
 
 jobs:
   fetch-code:
@@ -132,7 +132,7 @@ jobs:
               --region us-east-1
             fi
 
-            [[ $? == 0 ]] && aws s3 cp artifact.zip s3://circle-ci-test-990.raw.dev/
+            [[ $? == 0 ]] && aws s3 cp --recursive artifact.zip s3://circle-ci-test-990.raw.dev/
 
   deploy-uat:
     docker:
