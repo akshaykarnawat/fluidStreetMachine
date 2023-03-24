@@ -36,7 +36,7 @@ function deploy() {
         aws cloudformation create-stack --stack-name ${stack_name} \
         --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
         --parameters ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-        ParameterKey=BucketName,ParameterValue=${bucket_name} \
+        ParameterKey=BucketName,ParameterValue=${bucket_name,,} \
         ParameterKey=DataLayer,ParameterValue=${layer} \
         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
