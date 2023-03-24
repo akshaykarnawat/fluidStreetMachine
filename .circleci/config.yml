@@ -45,12 +45,16 @@ commands:
             python3 -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
             schemachange -h
   deploy_snowflake:
+    parameters:
+      snowflake_authenticator:
+        type: string
+        default: snowflake
     steps:
       - get_schema_change_repo
       - run:
           name: Snowflake deployment using schemachange
           command: |
-            # SNOWFLAKE_AUTHENTICATOR=snowflake \
+            SNOWFLAKE_AUTHENTICATOR=<< parameters.snowflake_authenticator >> \
             schemachange \
             -f ./databases/snowflake/migrations \
             -a ${SNOWFLAKE_ACCOUNT} \
@@ -136,8 +140,7 @@ jobs:
           at: ~/workspace
       - run: source venv/bin/activate
       - deploy_snowflake:
-          environment:
-            SNOWFLAKE_AUTHENTICATOR: snowflake
+          snowflake_authenticator: snowflake
       - deploy_aws
       - deploy_matillion
       - deploy_fivetran
