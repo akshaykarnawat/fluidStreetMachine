@@ -12,8 +12,8 @@ $ tree ./
 | | |____file_formats/
 | | |____tables/
 | | |____migrations/
-| | | |____V0.0.2__load_data_from_s3.sql
 | | | |____V0.0.1__initial_database_objects.sql
+| | | |____V0.0.2__load_data_from_s3.sql
 | | |____transformations/
 | | |____stages/
 | | |____stored_procedures/
