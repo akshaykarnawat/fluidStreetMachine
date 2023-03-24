@@ -51,9 +51,6 @@ jobs:
     executor: aws-cli-executor
     steps:
       - checkout # check out the code in the project directory
-      - install_python
-      - create_virtual_env
-      - get_schema_change_repo
       - run: pwd; ls -la
       - persist_to_workspace:
           root: ./
@@ -62,15 +59,16 @@ jobs:
 
   build-code:
     description: Building the codebase and running through the test cases
-    executor: python-executor
+    executor: aws-cli-executor
     steps:
       - attach_workspace:
           at: ~/workspace
       - run: pwd; ls -la
-      - run: source venv/bin/activate
+      - install_python
+      - create_virtual_env
       - run:
           name: Installing requirements
-          command: pip install -r requirements.txt
+          command: pip3 install -r requirements.txt
       - run:
           name: Clean, lint, and run static scan on codebase
           command: pre-commit run --all-files
@@ -91,13 +89,13 @@ jobs:
             - ./
 
   deploy-dev:
+    description: Deploy to DEV environment
     executor: aws-cli-executor
     steps:
       - attach_workspace:
           at: ~/workspace
-      - install_python
       - run: source venv/bin/activate
-      - run: schemachange -h
+      - get_schema_change_repo
       # - run:
       #     name: installing schemachange requirements
       #     command: pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
