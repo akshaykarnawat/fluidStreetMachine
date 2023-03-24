@@ -19,6 +19,7 @@
 ###############################################################################
 function logger::init() {
     local RUN_LOG_PATH="${1}"
+    local PREFIX="${2}"
     local CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
 
     # create the log path directory
@@ -29,7 +30,7 @@ function logger::init() {
     #find ${RUN_LOG_PATH} -type -f -mtime +30 -delete
 
     # create the log file in the log path
-    local RUN_LOG_FILE=${RUN_LOG_PATH}/${CURRENT_TIME}.log
+    local RUN_LOG_FILE=${RUN_LOG_PATH}/${PREFIX}_${CURRENT_TIME}.log
     touch ${RUN_LOG_FILE}
     chmod 775 ${RUN_LOG_FILE}
 
