@@ -6,7 +6,7 @@ executors:
       - image: cimg/aws:2023.03
     resource_class: small
     working_directory: ~/workspace
-  
+
   python-executor:
     docker:
       - image: cimg/python:3.11.2
