@@ -3,44 +3,49 @@
 ``` text
 $ tree ./
 .
+|____.circleci/
+| |____config.yml
+|____configs/
+|____dashboards/
 |____databases/
 | |____snowflake/
 | | |____file_formats/
 | | |____tables/
-| | | |____change_history.sql
 | | |____migrations/
-| | | |____V1.0.0__initial_database_objects.sql
+| | | |____V0.0.2__load_data_from_s3.sql
+| | | |____V0.0.1__initial_database_objects.sql
+| | |____transformations/
 | | |____stages/
+| | |____stored_procedures/
 | | |____functions/
 | | |____views/
-|____requirements.txt
-|____references/
-|____Makefile
-|____tests/
+|____demo/
+| |____data/
+| | |____processed/
+| | |____raw/
 |____docs/
-|____README.md
 |____iac/
 | |____terraform/
 | |____cfn/
-| | |____s3_bucket.yaml
-|____.gitignore
-|____dashboards/
-|____configs/
-| |____schemachange-config.yml
-|____scripts/
 |____jobs/
 | |____workflows/
-|____.circleci/
-| |____config.yml
 |____notebooks/
+|____references/
+|____scripts/
 |____src/
-| |____features/
-| |______init__.py
-| |____utils/
-| |____models/
 | |____common/
-| |____visualizations/
+| | |____utils/
+| | |____abstractions/
+| | |____extractors/
+| | |____loaders/
 | |____data/
-| | |______init__.py
 | | |____make_dataset.py
+| |____features/
+| |____models/
+| |____visualizations/
+|____tests/
+|____.pre-commit-config.yaml
+|____Makefile
+|____README.md
+|____requirements.txt
 ```
