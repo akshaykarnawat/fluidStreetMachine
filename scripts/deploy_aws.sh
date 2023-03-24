@@ -27,7 +27,7 @@ function deploy() {
     get_all_stacks
 
     local layer="Raw"
-    local bucket_name=gen3-data-arch.${layer,,}.${ENVIRONMENT,,}
+    local bucket_name=gen3-data-arch
     local stack_name=${PROJECT_NAME}-s3-bucket-${layer}-${ENVIRONMENT}
 
     # creating a stack if the stack does not exist already
@@ -45,7 +45,7 @@ function deploy() {
     # todo fixme -- get the list of buckets and check if the bucket exists before adding anything to the bucket
     sleep 60 # temp
 
-    aws s3 cp artifact.zip s3://${bucket_name}/
+    aws s3 cp artifact.zip s3://${bucket_name}.${layer,,}.${ENVIRONMENT,,}/
 
 }
 
