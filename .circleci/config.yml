@@ -96,25 +96,22 @@ jobs:
           at: ~/workspace
       - run: source venv/bin/activate
       - get_schema_change_repo
-      # - run:
-      #     name: installing schemachange requirements
-      #     command: pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
-      # - run: echo deploying the codebase to the dev snowflake env
-      # - run:
-      #     name: snowflake deployment
-      #     command: |
-      #       SNOWFLAKE_AUTHENTICATOR=snowflake \
-      #       python3 schemachange/schemachange/cli.py \
-      #       -f ./databases/snowflake/migrations \
-      #       -a ${SNOWFLAKE_ACCOUNT} \
-      #       -u ${SNOWFLAKE_USER} \
-      #       -r ${SNOWFLAKE_ROLE} \
-      #       -w ${SNOWFLAKE_WAREHOUSE} \
-      #       -d ${SNOWFLAKE_DATABASE} \
-      #       -c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
-      #       --query-tag DATA_ENGINEERING \
-      #       --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
-      #       -v
+      - run:
+          name: Snowflake deployment
+          command: |
+            SNOWFLAKE_AUTHENTICATOR=snowflake \
+            schemachange \
+            -f ./databases/snowflake/migrations \
+            -a ${SNOWFLAKE_ACCOUNT} \
+            -u ${SNOWFLAKE_USER} \
+            -r ${SNOWFLAKE_ROLE} \
+            -w ${SNOWFLAKE_WAREHOUSE} \
+            -d ${SNOWFLAKE_DATABASE} \
+            -c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
+            --create-change-history-table \
+            --query-tag DATA_ENGINEERING \
+            --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
+            -v
       # - run: echo deploying the codebase to the dev aws dev env using cloudformation
       # - run:
       #     name: AWS deployment
