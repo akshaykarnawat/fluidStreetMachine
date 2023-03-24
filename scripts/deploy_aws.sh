@@ -20,7 +20,7 @@ function get_all_stacks() {
 # get_all_stacks
 # get all the current stacks deployed
 ###############################################################################
-function depoy() {
+function deploy() {
     local TEMPLATE_PATH=${1}
 
     echo Here are all the stacks currently deployed
