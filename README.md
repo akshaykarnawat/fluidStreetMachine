@@ -6,20 +6,11 @@ $ tree ./
 |____databases/
 | |____snowflake/
 | | |____file_formats/
-| | | |____csv_no_header.sql
-| | | |____json.sql
 | | |____tables/
-| | | |____test.sql
-| | | |____trips.sql
 | | | |____change_history.sql
-| | | |____weather.sql
 | | |____migrations/
-| | | |____V1.0.2__create_table_test_using_vars.sql
 | | | |____V1.0.0__initial_database_objects.sql
-| | | |____V1.0.1__load_data_from_s3.sql
 | | |____stages/
-| | | |____trips.sql
-| | | |____weather.sql
 | | |____functions/
 | | |____views/
 |____requirements.txt

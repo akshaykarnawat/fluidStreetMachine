@@ -1,25 +1,37 @@
 version: 2.1
 
 executors:
-  my-executor:
+  aws-cli-executor:
     docker:
-      # - image: cimg/python:3.11.2
       - image: cimg/aws:2023.03
     resource_class: small
     working_directory: ~/workspace
+  python-executor:
+    docker:
+      - image: cimg/python:3.11.2
+    resource_class: small
+    working_directory: ~/workspace
+  ubuntu-executor:
+    machine:
+      image: ubuntu-2204:2022.07.1
+    resource_class: medium
+    working_directory: ~/workspace
 
 commands:
+  get_listing:
+    steps:
+      - run: pwd; ls -la
   install_python:
     steps:
       - run:
-          name: install python in environment
+          name: Install python in environment
           command: |
             sudo apt-get update
             sudo apt-get install python3.11
   create_virtual_env:
     steps:
       - run:
-          name: create a virual environment
+          name: Create a virual environment
           command: |
             pip3 install --upgrade pip
             pip3 install --user virtualenv
@@ -28,49 +40,87 @@ commands:
   get_schema_change_repo:
     steps:
       - run:
-          name: getting schemachange repo
+          name: Get schemachange repo and install
           command: |
-            git clone https://github.com/Snowflake-Labs/schemachange.git --depth=1
-            # pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
-            # python3 schemachange/schemachange/cli.py -h
+            python3 -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
+            schemachange -h
+  deploy_snowflake:
+    parameters:
+      snowflake_authenticator:
+        type: string
+        default: snowflake
+    steps:
+      - get_schema_change_repo
+      - run:
+          name: Snowflake deployment using schemachange
+          command: |
+            SNOWFLAKE_AUTHENTICATOR=<< parameters.snowflake_authenticator >> \
+            schemachange \
+            -f ./databases/snowflake/migrations \
+            -a ${SNOWFLAKE_ACCOUNT} \
+            -u ${SNOWFLAKE_USER} \
+            -r ${SNOWFLAKE_ROLE} \
+            -w ${SNOWFLAKE_WAREHOUSE} \
+            -d ${SNOWFLAKE_DATABASE} \
+            -c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
+            --create-change-history-table \
+            --query-tag DATA_ENGINEERING \
+            --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
+            -v
+  deploy_aws:
+    steps:
+      - run:
+          name: AWS deployment
+          command: |
+            aws --version
+            bash scripts/deploy_aws.sh ${ENV}
+  deploy_matillion:
+    steps:
+      - run:
+          name: Matillion deployment
+          command: |
+            echo TODO - deploy matillion
+  deploy_fivetran:
+    steps:
+      - run:
+          name: Fivetran deployment
+          command: |
+            echo FIXME - deploy fivetran
+            # echo AUTH_TOKEN=\"${FIVETRAN_AUTH_TOKEN}\" > .env
+            # bash scripts/deploy_fivetran.sh
 
 jobs:
   fetch-code:
     description: Checkout codebase
-    # machine:
-    #   image: ubuntu-2204:2022.07.1
-    # resource_class: medium
-    executor: my-executor
+    executor: aws-cli-executor
     steps:
       - checkout # check out the code in the project directory
-      - install_python
-      - create_virtual_env
-      - get_schema_change_repo
-      - run: pwd; ls -la
+      - get_listing
       - persist_to_workspace:
           root: ./
           paths:
             - ./
 
   build-code:
-    description: building the codebase and running through the test cases
-    executor: my-executor
+    description: Building the codebase and running through the test cases
+    executor: aws-cli-executor
     steps:
       - attach_workspace:
           at: ~/workspace
-      - run: pwd; ls -la
-      - run: source venv/bin/activate
+      - get_listing
+      - install_python
+      - create_virtual_env
       - run:
-          name: installing requirements
+          name: Installing requirements
           command: pip3 install -r requirements.txt
       - run:
-          name: clean, lint, and static scan codebase
+          name: Clean, lint, and run static scan on codebase
           command: pre-commit run --all-files
       - run:
-          name: test codebase
+          name: Test codebase
           command: echo unit testing and code coverage of the build
       - run:
-          name: build codebase
+          name: Build codebase
           command: |
             zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
             chmod 755 artifact.zip
@@ -83,70 +133,49 @@ jobs:
             - ./
 
   deploy-dev:
-    executor: my-executor
+    description: Deploy to the DEV environment
+    executor: aws-cli-executor
     steps:
       - attach_workspace:
           at: ~/workspace
       - run: source venv/bin/activate
-      - run:
-          name: installing schemachange requirements
-          command: pip3 install numpy requests $(cat schemachange/requirements.txt | awk -F== '{print $1}')
-      - run: echo deploying the codebase to the dev snowflake env
-      - run:
-          name: snowflake deployment
-          command: |
-            SNOWFLAKE_AUTHENTICATOR=snowflake \
-            python3 schemachange/schemachange/cli.py \
-            -f ./databases/snowflake/migrations \
-            -a ${SNOWFLAKE_ACCOUNT} \
-            -u ${SNOWFLAKE_USER} \
-            -r ${SNOWFLAKE_ROLE} \
-            -w ${SNOWFLAKE_WAREHOUSE} \
-            -d ${SNOWFLAKE_DATABASE} \
-            -c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
-            --query-tag DATA_ENGINEERING \
-            --vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
-            -v
-      - run: echo deploying the codebase to the dev aws dev env using cloudformation
-      - run:
-          name: AWS deployment
-          command: |
-            ls -la;
-            make lint data;
-            aws --version;
-            aws s3 ls;
-
-            echo Here are all the stacks:
-            aws cloudformation list-stacks --stack-status-filter "CREATE_COMPLETE" --query "StackSummaries[].StackName";
-
-            # creating a stack if the stack does not exist already
-            stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'myteststack')].StackName" --output text)
-            if [[ ${stack} != "myteststack" ]]; then
-              echo Creating a stack --region us-east-1
-              aws cloudformation create-stack --stack-name myteststack \
-              --template-body file://iac/cfn/s3_bucket.yaml \
-              --parameters ParameterKey=ProjectName,ParameterValue=S3BucketStack \
-              ParameterKey=BucketName,ParameterValue=circle-ci-test-990 \
-              ParameterKey=DataLayer,ParameterValue=Raw \
-              ParameterKey=Environment,ParameterValue=Dev \
-              --region us-east-1
-            fi
-
-            [[ $? == 0 ]] && aws s3 cp artifact.zip s3://circle-ci-test-990.raw.dev/
+      - deploy_snowflake:
+          snowflake_authenticator: snowflake
+      - deploy_aws
+      - deploy_matillion
+      - deploy_fivetran
+    environment:
+      ENV: Dev
 
   deploy-uat:
-    docker:
-      - image: cimg/aws:2023.03
-    resource_class: small
+    description: Deploy to the UAT environment
+    executor: aws-cli-executor
     steps:
-      - run: echo deploying the codebase to the uat env
+      - attach_workspace:
+          at: ~/workspace
+      - run: source venv/bin/activate
+      # - deploy_snowflake:
+      #     snowflake_authenticator: snowflake
+      # - deploy_aws
+      # - deploy_matillion
+      # - deploy_fivetran
+    environment:
+      ENV: Uat
 
   deploy-prod:
-    docker:
-      - image: cimg/aws:2023.03
-    resource_class: small
+    description: Deploy to the PROD environment
+    executor: aws-cli-executor
     steps:
-      - run: echo deploying the codebase to the prod env
+      - attach_workspace:
+          at: ~/workspace
+      - run: source venv/bin/activate
+      # - deploy_snowflake:
+      #     snowflake_authenticator: snowflake
+      # - deploy_aws
+      # - deploy_matillion
+      # - deploy_fivetran
+    environment:
+      ENV: Prod
 
 workflows:
   version: 2

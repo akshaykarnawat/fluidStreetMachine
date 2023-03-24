@@ -275,7 +275,7 @@ SCRIPT_DIR_PATH="${0%/*}"
 source ${SCRIPT_DIR_PATH}/logger.sh
 
 APP_PATH=$(dirname ${SCRIPT_DIR_PATH})
-RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs)
+RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs fivetran)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
 
 #load .env file

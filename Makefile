@@ -17,10 +17,6 @@ requirements:
 	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
 	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
 
-## Make Dataset
-data: requirements
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py --input data/raw --output data/processed
-
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
@@ -31,16 +27,25 @@ lint: requirements
 	flake8 src
 	cfn-lint iac/cfn/**/*.yaml
 
-## Run the schemachange
+## Pre-commit hook
+pre-commit: requirements
+	pre-commit run --all-files
+
+## Make Dataset
+data: requirements
+	$(PYTHON_INTERPRETER) -m src.data.make_dataset \
+	--input demo/data/raw/attendance.csv \
+	--output demo/data/processed/attendance_final.csv
+
+## Run the schemachange plugin
 schemachange:
-	# git clone schemachange
-	# pip install the requirements file
-	#
-	# one way -- using the config file
-	# SNOWFLAKE_AUTHENTICATOR=externalbrowser $(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py --config-folder ./configs -v
-	# another way
-	SNOWFLAKE_AUTHENTICATOR=externalbrowser \
-	$(PYTHON_INTERPRETER) ../schemachange/schemachange/cli.py \
+	$(PYTHON_INTERPRETER) -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
+	# specify the authentication method
+
+	# one way to run using the config file
+	# schemachange --config-folder ./configs -v
+
+	SNOWFLAKE_AUTHENTICATOR=externalbrowser schemachange \
 	-f ./databases/snowflake/migrations \
 	-a ${SNOWFLAKE_ACCOUNT} \
 	-u ${SNOWFLAKE_USER} \
@@ -48,6 +53,7 @@ schemachange:
 	-w ${SNOWFLAKE_WAREHOUSE} \
 	-d ${SNOWFLAKE_DATABASE} \
 	-c ${SNOWFLAKE_DATABASE}.${SNOWFLAKE_SCHEMA}.CHANGE_HISTORY \
+	--create-change-history-table \
 	--query-tag DATA_ENGINEERING \
 	--vars "{\"DB\": \"${SNOWFLAKE_DATABASE}\", \"SCHEMA\": \"${SNOWFLAKE_SCHEMA}\" }" \
 	-v
