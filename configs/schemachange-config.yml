@@ -10,7 +10,6 @@ modules-folder: null
 # snowflake-account: 'qfb61636.us-east-1'
 snowflake-account: 'fsb33346.prod3.us-west-2.aws'
 
-
 # The name of the snowflake user
 # snowflake-user: 'AKSHAY_KARNAWAT@MCKINSEY.COM'
 snowflake-user: 'akshay'
@@ -56,14 +55,14 @@ dry-run: false
 # A string to include in the QUERY_TAG that is attached to every SQL statement executed
 query-tag: 'DATA_ENGINEERING'
 
-# Information for Oauth token requests 
+# Information for Oauth token requests
 # oauthconfig:
 #   # url Where token request are posted to
 #   token-provider-url: 'https://login.microsoftonline.com/{{ env_var('AZURE_ORG_GUID', 'default') }}/oauth2/v2.0/token'
 #   # name of Json entity returned by request
 #   token-response-name: 'access_token'
 #   # Headers needed for successful post or other security markings ( multiple labeled items permitted
-#   token-request-headers: 
+#   token-request-headers:
 #     Content-Type: "application/x-www-form-urlencoded"
 #     User-Agent: "python/schemachange"
 #   # Request Payload for Token (it is recommended pass
