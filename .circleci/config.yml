@@ -24,14 +24,14 @@ commands:
   install_python:
     steps:
       - run:
-          name: install python in environment
+          name: Install python in environment
           command: |
             sudo apt-get update
             sudo apt-get install python3.11
   create_virtual_env:
     steps:
       - run:
-          name: create a virual environment
+          name: Create a virual environment
           command: |
             pip3 install --upgrade pip
             pip3 install --user virtualenv
@@ -40,7 +40,7 @@ commands:
   get_schema_change_repo:
     steps:
       - run:
-          name: get schemachange repo and setup
+          name: Get schemachange repo and install
           command: |
             python3 -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
             schemachange -h
@@ -48,7 +48,6 @@ commands:
 jobs:
   fetch-code:
     description: Checkout codebase
-    
     executor: aws-cli-executor
     steps:
       - checkout # check out the code in the project directory
@@ -62,7 +61,7 @@ jobs:
             - ./
 
   build-code:
-    description: building the codebase and running through the test cases
+    description: Building the codebase and running through the test cases
     executor: python-executor
     steps:
       - attach_workspace:
@@ -70,16 +69,16 @@ jobs:
       - run: pwd; ls -la
       - run: source venv/bin/activate
       - run:
-          name: installing requirements
+          name: Installing requirements
           command: pip install -r requirements.txt
       - run:
-          name: clean, lint, and static scan codebase
+          name: Clean, lint, and run static scan on codebase
           command: pre-commit run --all-files
       - run:
-          name: test codebase
+          name: Test codebase
           command: echo unit testing and code coverage of the build
       - run:
-          name: build codebase
+          name: Build codebase
           command: |
             zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
             chmod 755 artifact.zip
