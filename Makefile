@@ -35,7 +35,7 @@ pre-commit: requirements
 data: requirements
 	$(PYTHON_INTERPRETER) -m src.data.make_dataset --input demo/data/raw/attendance.csv --output demo/data/processed/attendance_final.csv
 
-## Run the schemachange library
+## Run the schemachange plugin
 schemachange: requirements
 	# git clone schemachange
 	# pip install the requirements file
