@@ -15,3 +15,5 @@
 --         FROM @WEATHER
 --     )
 --     FILE_FORMAT = (FORMAT_NAME = 'JSON');
+
+SELECT 1;
