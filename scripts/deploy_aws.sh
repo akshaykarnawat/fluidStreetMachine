@@ -27,7 +27,7 @@ function deploy() {
     get_all_stacks
 
     local layer="Raw"
-    local bucket_name=gen3-data-arch
+    local bucket_name=gen8-data-arch
     local stack_name=${PROJECT_NAME}-s3-bucket-${layer}-${ENVIRONMENT}
 
     # creating a stack if the stack does not exist already
