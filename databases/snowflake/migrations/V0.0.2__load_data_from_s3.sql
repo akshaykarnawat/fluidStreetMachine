@@ -1,4 +1,4 @@
--- -- Set the database and schema context
+-- Set the database and schema context
 USE SCHEMA {{ DB }}.{{ SCHEMA }};
 
 -- -- Load the trips data -- ** CAUTION ** 1G+ dataset size
