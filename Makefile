@@ -24,7 +24,7 @@ clean:
 
 ## Lint using flake8
 lint: requirements
-	flake8 src
+	flake8 --ignore=E501,E262 src
 	cfn-lint iac/cfn/**/*.yaml
 
 ## Pre-commit hook
@@ -38,7 +38,7 @@ data: requirements
 	--output demo/data/processed/attendance_final.csv
 
 ## Run the schemachange plugin
-schemachange:
+schemachange: requirements
 	$(PYTHON_INTERPRETER) -m pip install 'schemachange @ git+https://github.com/Snowflake-Labs/schemachange'
 	# specify the authentication method
 

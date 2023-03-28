@@ -51,6 +51,13 @@ Resources:
           ],
         ]
       ]
+      LifecycleConfiguration:
+        Rules:
+          - Id: IntelligentTieringRule
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 0
+                StorageClass: INTELLIGENT_TIERING
       Tags:
         - Key: env
           Value: !Ref Environment
