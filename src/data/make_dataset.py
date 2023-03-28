@@ -21,7 +21,7 @@ def make_data(input, output):
 
     logger.info("ETL job starting")
     logger.info(f"{input} data is being transformed to {output} here")
-    example_etl = (
+    _ = (
         ETLExample()
         .extract(filepath_or_buffer=input, delimiter=",")
         .transform(

@@ -1,7 +1,6 @@
 import sys
 
 # import boto3
-from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
