@@ -1,0 +1,6 @@
+CREATE OR REPLACE TABLE TEST
+(
+     ID number
+    , NOTES VARCHAR
+    ,T TIMESTAMP
+);
