@@ -46,8 +46,8 @@ function install_dependencies() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function create_packaged_zip() {
-    zip -r9 /snow_lambda.zip .
-    zip -g ${APP_PATH}/snow_lambda.zip ./functions/run_snowflake_transformations.py
+    zip -r9 ~/snow_lambda.zip .
+    zip -g ~/snow_lambda.zip ./functions/run_snowflake_transformations.py
 }
 
 ###############################################################################
