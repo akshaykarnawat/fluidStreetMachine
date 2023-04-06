@@ -27,7 +27,6 @@
 # Create and activate the virtual python environment
 ###############################################################################
 function create_and_activate_virtual_env() {
-    cd ${APP_PATH}
     virtualenv snow_lambda
     source snow_lambda/bin/activate
 }
@@ -37,7 +36,7 @@ function create_and_activate_virtual_env() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function install_dependencies() {
-    cd ${APP_PATH}/snow_lambda/lib64/python3.*/site-packages/
+    cd ./snow_lambda/lib*/python3.*/site-packages/
     pip3 install --platform manylinux_2_12_x86_64 --only-binary=:all: snowflake-connector-python --target .
     chmod -R 755 .
 }
@@ -47,7 +46,7 @@ function install_dependencies() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function create_packaged_zip() {
-    zip -r9 ${APP_PATH}/snow_lambda.zip .
+    zip -r9 /snow_lambda.zip .
     zip -g ${APP_PATH}/snow_lambda.zip ./functions/run_snowflake_transformations.py
 }
 
