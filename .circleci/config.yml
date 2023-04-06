@@ -3,7 +3,7 @@ version: 2.1
 executors:
   aws-cli-executor:
     docker:
-      - image: cimg/aws:2023.03
+      - image: cimg/aws:2023.04
     resource_class: small
     working_directory: ~/workspace
   python-executor:
@@ -11,11 +11,11 @@ executors:
       - image: cimg/python:3.11.2
     resource_class: small
     working_directory: ~/workspace
-  # lambda-executor:
-  #   docker:
-  #     - image: lambci/lambda
-  #   resource_class: small
-  #   working_directory: ~/workspace
+  lambda-executor:
+    docker:
+      - image: appfolio/lambda_ci@0.3.0
+    resource_class: small
+    working_directory: ~/workspace
   ubuntu-executor:
     machine:
       image: ubuntu-2204:2022.07.1
@@ -108,7 +108,7 @@ jobs:
 
   build-lambda-pkg:
     description: Build lambda package for snowflake
-    executor: ubuntu-executor
+    executor: lambda-executor
     steps:
       - attach_workspace:
           at: ~/workspace
