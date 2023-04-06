@@ -47,7 +47,8 @@ function install_dependencies() {
 ###############################################################################
 function create_packaged_zip() {
     zip -r9 ~/snow_lambda.zip .
-    zip -g ~/snow_lambda.zip ${APP_PATH}/functions/run_snowflake_transformations.py
+    cd ~
+    zip -g ~/snow_lambda.zip ./functions/run_snowflake_transformations.py
 }
 
 ###############################################################################
