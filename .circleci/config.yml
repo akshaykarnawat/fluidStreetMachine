@@ -122,7 +122,7 @@ jobs:
       - run:
           name: Build snowflake lambda package
           command: |
-              bash scripts/snowflake_lambda_pkg.sh
+              bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
               ls -la
       - store_artifacts:
           path: ./snow_lambda.zip
