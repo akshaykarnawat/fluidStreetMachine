@@ -22,9 +22,12 @@ function create_and_activate_virtual_env() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function install_dependencies() {
-    local site_pkg_dir=./${ENV_NAME}/lib*/python3.*/site-packages/
+    pwd
+    ls -la
+    ls -la ${ENV_NAME}
+    local site_pkg_dir=${ENV_NAME}/lib*/python3.*/site-packages/
     cd ${site_pkg_dir}
-    pip3 install --platform ${PLATFORM} --only-binary=:all: ${PACKAGE} --target .
+    pip3 install --upgrade --platform ${PLATFORM} --only-binary=:all: ${PACKAGE} --target .
     chmod -R 755 ${site_pkg_dir}
 }
 
