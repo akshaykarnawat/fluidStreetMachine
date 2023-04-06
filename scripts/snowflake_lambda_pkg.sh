@@ -25,10 +25,10 @@ function install_dependencies() {
     pwd
     ls -la
     ls -la ${ENV_NAME}
-    local site_pkg_dir=${ENV_NAME}/lib/python3.*/site-packages/
+    local site_pkg_dir=./${ENV_NAME}/lib/python3.*/site-packages/
     cd ${site_pkg_dir}
     pip3 install --upgrade --platform ${PLATFORM} --only-binary=:all: ${PACKAGE} --target .
-    chmod -R 755 ${site_pkg_dir}
+    chmod -R 755 .
 }
 
 ###############################################################################
