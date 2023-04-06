@@ -110,8 +110,7 @@ jobs:
     description: Build lambda package for snowflake
     executor: lambda-executor
     steps:
-      - attach_workspace:
-          at: ~/workspace
+      - checkout # check out the code in the project directory
       - get_listing
       - run:
           name: Build snowflake lambda package
