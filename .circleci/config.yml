@@ -22,9 +22,6 @@ executors:
     resource_class: medium
     working_directory: ~/workspace
 
-orbs:
-  lambda_ci: appfolio/lambda_ci@0.3.0
-
 commands:
   get_listing:
     steps:
