@@ -11,6 +11,11 @@ executors:
       - image: cimg/python:3.11.2
     resource_class: small
     working_directory: ~/workspace
+  lambda-executor:
+    docker:
+      - image: lambci/lambda
+    resource_class: small
+    working_directory: ~/workspace
   ubuntu-executor:
     machine:
       image: ubuntu-2204:2022.07.1
@@ -101,6 +106,22 @@ jobs:
           paths:
             - ./
 
+  build-lambda-pkg:
+    description: Build lambda package for snowflake
+    executor: lambda-executor
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - get_listing
+      - run:
+          name: Build snowflake lambda package
+          command: |
+              bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
+              ls -la
+      - store_artifacts:
+          path: ./snow_lambda.zip
+          destination: snow_lambda
+
   build-code:
     description: Building the codebase and running through the test cases
     executor: aws-cli-executor
@@ -119,14 +140,6 @@ jobs:
       - run:
           name: Test codebase
           command: echo unit testing and code coverage of the build
-      - run:
-          name: Build snowflake lambda package
-          command: |
-              bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
-              ls -la
-      - store_artifacts:
-          path: ./snow_lambda.zip
-          destination: snow_lambda
       - run:
           name: Build codebase
           command: |
@@ -190,6 +203,7 @@ workflows:
   my-workflow:
     jobs:
       - fetch-code
+      - build-lambda-pkg
       - build-code:
           requires:
               - fetch-code
