@@ -27,7 +27,7 @@ commands:
           name: Install python in environment
           command: |
             sudo apt-get update
-            sudo apt-get install python3
+            sudo apt-get install python3.9
   create_virtual_env:
     steps:
       - run:
