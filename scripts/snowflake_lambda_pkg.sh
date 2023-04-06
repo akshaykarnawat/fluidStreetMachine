@@ -36,7 +36,7 @@ function create_packaged_zip() {
     local zip_file_location=~/workspace/${ENV_NAME}.zip
     zip -r9 ${zip_file_location} .
     # cd ~/workspace/
-    zip -g ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/*
+    zip -jg ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/*
 }
 
 ###############################################################################
@@ -53,7 +53,6 @@ source ${SCRIPT_DIR_PATH}/logger.sh
 APP_PATH=$(dirname ${SCRIPT_DIR_PATH})
 RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda_pkg)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
-
 
 PLATFORM=manylinux_2_12_x86_64
 PACKAGE=snowflake-connector-python
