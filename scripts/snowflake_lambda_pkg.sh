@@ -37,7 +37,8 @@ function create_and_activate_virtual_env() {
 ###############################################################################
 function install_dependencies() {
     cd ./snow_lambda/lib*/python3.*/site-packages/
-    pip3 install --platform manylinux_2_12_x86_64 --only-binary=:all: snowflake-connector-python --target .
+    pip3 install --platform ${PLATFORM} --only-binary=:all: ${PACKAGE} \
+    --target .
     chmod -R 755 .
 }
 
@@ -46,11 +47,11 @@ function install_dependencies() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function create_packaged_zip() {
-    zip -r9 ~/snow_lambda.zip .
-    echo ${APP_PATH}
+    zip -r9 ~/workspace/snow_lambda.zip .
+    echo ${APP_PATH} ${SCRIPT_DIR_PATH}
     pwd
     cd ~/workspace/
-    zip -g ~/snow_lambda.zip ./functions/run_snowflake_transformations.py
+    zip -g ~/workspace/snow_lambda.zip ./functions/run_snowflake_transformations.py
 }
 
 ###############################################################################
@@ -65,6 +66,9 @@ source ${SCRIPT_DIR_PATH}/logger.sh
 APP_PATH=$(dirname ${SCRIPT_DIR_PATH})
 RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda_pkg)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
+
+PLATFORM=manylinux_2_12_x86_64
+PACKAGE=snowflake-connector-python
 
 create_and_activate_virtual_env
 install_dependencies
