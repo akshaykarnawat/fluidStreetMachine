@@ -37,7 +37,7 @@ function create_and_activate_virtual_env() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function install_dependencies() {
-    cd ${APP_PATH}/snow_lambda/lib64/python3.9/site-packages/
+    cd ${APP_PATH}/snow_lambda/lib64/python3.*/site-packages/
     pip3 install --platform manylinux_2_12_x86_64 --only-binary=:all: snowflake-connector-python --target .
     chmod -R 755 .
 }
