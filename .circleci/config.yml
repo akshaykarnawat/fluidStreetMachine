@@ -203,10 +203,13 @@ workflows:
   my-workflow:
     jobs:
       - fetch-code
-      - build-lambda-pkg
+      - build-lambda-pkg:
+          requires:
+              - fetch-code
       - build-code:
           requires:
               - fetch-code
+              - build-lambda-pkg
 
       # deploy the build to dev
       - deploy-dev:
