@@ -11,11 +11,6 @@ executors:
       - image: cimg/python:3.9
     resource_class: small
     working_directory: ~/workspace
-  # lambda-executor:
-  #   docker:
-  #     - image: appfolio/lambda_ci@0.3.0
-  #   resource_class: small
-  #   working_directory: ~/workspace
   ubuntu-executor:
     machine:
       image: ubuntu-2204:2022.07.1
@@ -117,19 +112,23 @@ jobs:
           name: Build snowflake lambda package
           command: |
               bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
-              ls -la
+              la -la
       - store_artifacts:
           path: ./snow_lambda.zip
           destination: snow_lambda
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./
 
   build-code:
     description: Building the codebase and running through the test cases
-    executor: aws-cli-executor
+    executor: python-executor
     steps:
       - attach_workspace:
           at: ~/workspace
       - get_listing
-      - install_python
+      # - install_python
       - create_virtual_env
       - run:
           name: Installing requirements
