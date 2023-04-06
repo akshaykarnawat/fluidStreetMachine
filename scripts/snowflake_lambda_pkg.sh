@@ -19,7 +19,7 @@
 #cd ~
 #vim lambda_function.py
 # {{copy lambda function code in vim}}
-#zip -g snow_lambda.zip lambda_function.py 
+#zip -g snow_lambda.zip lambda_function.py
 #aws s3 cp snow_lambda.zip s3://snowflake-connector-lambda
 
 
@@ -70,4 +70,3 @@ source ${SCRIPT_DIR_PATH}/logger.sh
 APP_PATH=$(dirname ${SCRIPT_DIR_PATH})
 RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda_pkg)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
-
