@@ -23,11 +23,14 @@
 #aws s3 cp snow_lambda.zip s3://snowflake-connector-lambda
 
 
+###############################################################################
+# check_required_packages
+# check if the required packages are in the vm
+###############################################################################
 function check_required_packages() {
     # check to see if python and pip are installed in the VM
     # then check if virtualenv is installed as a python package
 }
-
 
 ###############################################################################
 # create_and_activate_virtual_env
@@ -70,3 +73,8 @@ source ${SCRIPT_DIR_PATH}/logger.sh
 APP_PATH=$(dirname ${SCRIPT_DIR_PATH})
 RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda_pkg)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
+
+check_required_packages
+create_and_activate_virtual_env
+install_dependencies
+create_packaged_zip
