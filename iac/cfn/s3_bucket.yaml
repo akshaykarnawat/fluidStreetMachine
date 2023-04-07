@@ -35,7 +35,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Join [ '-', [ "fluidMachine",
+      BucketName: !Join [ '-', [ "fluidmachine",
           !FindInMap [
             DataLayerToBucketSuffix,
             !Ref DataLayer,
