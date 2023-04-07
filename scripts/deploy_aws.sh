@@ -38,10 +38,10 @@ function deploy() {
         ParameterKey=DataLayer,ParameterValue=${layer} \
         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
-        
+
         sleep 30 # temp
     fi
-    
+
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[?(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}
 
