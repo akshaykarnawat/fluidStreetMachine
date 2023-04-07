@@ -38,19 +38,20 @@ function deploy() {
         ParameterKey=DataLayer,ParameterValue=${layer} \
         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
-
         sleep 30 # temp
     fi
 
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}
     aws s3 cp snow_lambda.zip s3://${bucket}
+    for i in ("databases" "functions" "iac/cfn"); do
+        aws s3 cp ./$i/* s3://${bucket} --recursive
+    done
 
-    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
     # update lambda function codebase
+    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
     [[ -n lambda_function ]] && \
     aws lambda update-function-code --function-name ${lambda_function} --region us-east-1 --s3-bucket ${bucket} --s3-key snow_lambda.zip
-
 
 }
 
