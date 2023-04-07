@@ -46,7 +46,7 @@ function deploy() {
     aws s3 cp snow_lambda.zip s3://${bucket}
     dirsToUpload=("databases" "functions" "iac/cfn")
     for i in ${dirsToUpload[@]}; do
-        aws s3 cp ./$i/* s3://${bucket} --recursive
+        aws s3 cp ./$i s3://${bucket} --recursive
     done
 
     # update lambda function codebase
