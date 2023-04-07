@@ -3,12 +3,12 @@ version: 2.1
 executors:
   aws-cli-executor:
     docker:
-      - image: cimg/aws:2023.03
+      - image: cimg/aws:2023.04
     resource_class: small
     working_directory: ~/workspace
   python-executor:
     docker:
-      - image: cimg/python:3.11.2
+      - image: cimg/python:3.9
     resource_class: small
     working_directory: ~/workspace
   ubuntu-executor:
@@ -27,7 +27,7 @@ commands:
           name: Install python in environment
           command: |
             sudo apt-get update
-            sudo apt-get install python3.11
+            sudo apt-get install python3.9
   create_virtual_env:
     steps:
       - run:
@@ -101,14 +101,34 @@ jobs:
           paths:
             - ./
 
-  build-code:
-    description: Building the codebase and running through the test cases
-    executor: aws-cli-executor
+  build-lambda-pkg:
+    description: Build lambda package for snowflake
+    executor: python-executor
     steps:
       - attach_workspace:
           at: ~/workspace
       - get_listing
-      - install_python
+      - run:
+          name: Build snowflake lambda package
+          command: |
+              bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
+              ls -la
+      - store_artifacts:
+          path: ./snow_lambda.zip
+          destination: snow_lambda
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./
+
+  build-code:
+    description: Building the codebase and running through the test cases
+    executor: python-executor
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - get_listing
+      # - install_python
       - create_virtual_env
       - run:
           name: Installing requirements
@@ -122,7 +142,7 @@ jobs:
       - run:
           name: Build codebase
           command: |
-            zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
+            zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*" -x "snow_lambda/*"
             chmod 755 artifact.zip
       - store_artifacts:
           path: ./artifact.zip
@@ -182,9 +202,12 @@ workflows:
   my-workflow:
     jobs:
       - fetch-code
-      - build-code:
+      - build-lambda-pkg:
           requires:
               - fetch-code
+      - build-code:
+          requires:
+              - build-lambda-pkg
 
       # deploy the build to dev
       - deploy-dev:
