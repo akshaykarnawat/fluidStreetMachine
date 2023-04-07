@@ -112,7 +112,7 @@ jobs:
           name: Build snowflake lambda package
           command: |
               bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
-              la -la
+              ls -la
       - store_artifacts:
           path: ./snow_lambda.zip
           destination: snow_lambda
