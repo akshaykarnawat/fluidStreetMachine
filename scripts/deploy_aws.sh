@@ -44,6 +44,13 @@ function deploy() {
 
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}
+    aws s3 cp snow_lambda.zip s3://${bucket}
+
+    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
+    # update lambda function codebase
+    [[ -n lambda_function ]] && \
+    aws lambda update-function-code --function-name ${lambda_function} --region us-east-1 --s3-bucket ${bucket} --s3-key snow_lambda.zip
+
 
 }
 
