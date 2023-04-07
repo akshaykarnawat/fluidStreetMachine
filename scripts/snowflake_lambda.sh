@@ -34,8 +34,8 @@ function install_dependencies() {
 ###############################################################################
 function create_packaged_zip() {
     local zip_file_location=~/workspace/${ENV_NAME}.zip
-    zip -r9 ${zip_file_location} . | tee -a ${RUN_LOG_FILE}
-    zip -jg ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/* | tee -a ${RUN_LOG_FILE}
+    zip -r9 ${zip_file_location} .
+    zip -jg ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/*
 }
 
 ###############################################################################
