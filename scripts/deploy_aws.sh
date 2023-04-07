@@ -42,7 +42,7 @@ function deploy() {
         sleep 30 # temp
     fi
 
-    bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[?contains(OutputKey, 'BucketName')].OutputValue" --output text)
+    bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}
 
 }
