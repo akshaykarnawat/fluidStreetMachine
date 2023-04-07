@@ -22,9 +22,6 @@ function create_and_activate_virtual_env() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function install_dependencies() {
-    pwd
-    ls -la
-    ls -la ${ENV_NAME}
     local site_pkg_dir=./${ENV_NAME}/lib/python3.*/site-packages/
     cd ${site_pkg_dir}
     pip3 install --upgrade --platform ${PLATFORM} --only-binary=:all: ${PACKAGE} --target .
@@ -38,7 +35,6 @@ function install_dependencies() {
 function create_packaged_zip() {
     local zip_file_location=~/workspace/${ENV_NAME}.zip
     zip -r9 ${zip_file_location} .
-    # cd ~/workspace/
     zip -jg ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/*
 }
 
@@ -54,7 +50,7 @@ LAMBDA_FUNC_LOCATION=${2}
 source ${SCRIPT_DIR_PATH}/logger.sh
 
 APP_PATH=$(dirname ${SCRIPT_DIR_PATH})
-RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda_pkg)
+RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
 
 PLATFORM=manylinux_2_12_x86_64

@@ -101,26 +101,6 @@ jobs:
           paths:
             - ./
 
-  build-lambda-pkg:
-    description: Build lambda package for snowflake
-    executor: python-executor
-    steps:
-      - attach_workspace:
-          at: ~/workspace
-      - get_listing
-      - run:
-          name: Build snowflake lambda package
-          command: |
-              bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
-              ls -la
-      - store_artifacts:
-          path: ./snow_lambda.zip
-          destination: snow_lambda
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - ./
-
   build-code:
     description: Building the codebase and running through the test cases
     executor: python-executor
@@ -139,6 +119,12 @@ jobs:
       - run:
           name: Test codebase
           command: echo unit testing and code coverage of the build
+      - run:
+          name: Build snowflake lambda package
+          command: bash scripts/snowflake_lambda.sh snow_lambda ~/workspace/functions
+      - store_artifacts:
+          path: ./snow_lambda.zip
+          destination: snow_lambda
       - run:
           name: Build codebase
           command: |
@@ -202,12 +188,9 @@ workflows:
   my-workflow:
     jobs:
       - fetch-code
-      - build-lambda-pkg:
-          requires:
-              - fetch-code
       - build-code:
           requires:
-              - build-lambda-pkg
+              - fetch-code
 
       # deploy the build to dev
       - deploy-dev:
