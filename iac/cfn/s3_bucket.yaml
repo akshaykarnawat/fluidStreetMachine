@@ -2,9 +2,7 @@ Parameters:
   ProjectName:
     Type: String
     Description: "Project name"
-  BucketName:
-    Type: String
-    Description: "Set a bucket name"
+    Default: "arch_prj"
   DataLayer:
     Type: String
     AllowedValues:
@@ -37,8 +35,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Join [ '.', [
-          !Ref BucketName,
+      BucketName: !Join [ '-', [ "fluidMachine",
           !FindInMap [
             DataLayerToBucketSuffix,
             !Ref DataLayer,
@@ -49,17 +46,16 @@ Resources:
             !Ref Environment,
             Suffix
           ],
+          !Select [0, !Split [-, !Select [2, !Split [/, !Ref AWS::StackId ]]]]
         ]
       ]
-      LifecycleConfiguration:
-        Rules:
-          - Id: IntelligentTieringRule
-            Status: Enabled
-            Transitions:
-              - TransitionInDays: 0
-                StorageClass: INTELLIGENT_TIERING
       Tags:
         - Key: env
           Value: !Ref Environment
         - Key: proj
           Value: !Ref ProjectName
+
+Outputs:
+  BucketName:
+    Description: Name of bucket
+    Value: !Ref S3Bucket

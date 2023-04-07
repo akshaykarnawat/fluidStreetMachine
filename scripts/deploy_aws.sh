@@ -27,8 +27,7 @@ function deploy() {
     get_all_stacks
 
     local layer="Raw"
-    local bucket_name=gen8-data-arch
-    local stack_name=${PROJECT_NAME}-s3-bucket-${layer}-${ENVIRONMENT}
+    local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT,,}
 
     # creating a stack if the stack does not exist already
     stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].StackName" --output text)
@@ -36,16 +35,15 @@ function deploy() {
         aws cloudformation create-stack --stack-name ${stack_name} \
         --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
         --parameters ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-        ParameterKey=BucketName,ParameterValue=${bucket_name} \
         ParameterKey=DataLayer,ParameterValue=${layer} \
         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
+        
+        sleep 30 # temp
     fi
-
-    # todo fixme -- get the list of buckets and check if the bucket exists before adding anything to the bucket
-    sleep 60 # temp
-
-    aws s3 cp artifact.zip s3://${bucket_name}.${layer,,}.${ENVIRONMENT,,}/
+    
+    bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[?(OutputKey, 'BucketName')].OutputValue" --output text)
+    aws s3 cp artifact.zip s3://${bucket}
 
 }
 

@@ -121,9 +121,7 @@ jobs:
           command: echo unit testing and code coverage of the build
       - run:
           name: Build snowflake lambda package
-          command: |
-              bash scripts/snowflake_lambda_pkg.sh snow_lambda ~/workspace/functions
-              ls -la
+          command: bash scripts/snowflake_lambda.sh snow_lambda ~/workspace/functions
       - store_artifacts:
           path: ./snow_lambda.zip
           destination: snow_lambda
