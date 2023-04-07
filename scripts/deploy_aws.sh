@@ -44,7 +44,8 @@ function deploy() {
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}
     aws s3 cp snow_lambda.zip s3://${bucket}
-    for i in ("databases" "functions" "iac/cfn"); do
+    dirsToUpload=("databases" "functions" "iac/cfn")
+    for i in ${dirsToUpload[@]}; do
         aws s3 cp ./$i/* s3://${bucket} --recursive
     done
 
