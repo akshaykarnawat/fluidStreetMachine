@@ -142,7 +142,7 @@ jobs:
       - run:
           name: Build codebase
           command: |
-            zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*"
+            zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*" -x "snow_lambda/*"
             chmod 755 artifact.zip
       - store_artifacts:
           path: ./artifact.zip
