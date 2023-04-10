@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ELT state machine -- runs matillion job and snowflake transformation queries
+
+Resources:
+  ELTStatesExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: states.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/'
+
+  ELTStateMachine:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Properties:
+      DefinitionString: |-
+        {
+          "Comment": "An example of the Amazon States Language for scheduling a task.",
+          "StartAt": "Wait for Timer",
+          "States": {
+            "Wait for Timer": {
+              "Type": "Wait",
+              "SecondsPath": "$.timer_seconds",
+              "Next": "Success"
+            },
+            "Success": {
+              "Type": "Succeed"
+            }
+          }
+        }
+      RoleArn: !GetAtt [ELTStatesExecutionRole, Arn]
+
+Outputs:
+  ELTStateMachineArn:
+    Value:
+      Ref: ELTStateMachine
+  ExecutionInput:
+    Description: Sample input to StartExecution.
+    Value: '{ "timer_seconds": 10 }'
