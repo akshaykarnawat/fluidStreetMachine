@@ -145,16 +145,16 @@ function deploy() {
             ParameterKey=DataLayer,ParameterValue=${layer} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
-        sleep 30 # temp
+        sleep 30
     fi
 
     # upload all artifacts and files to aws
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
-    aws s3 cp artifact.zip s3://${bucket}
-    aws s3 cp snow_lambda.zip s3://${bucket}
+    aws s3 cp artifact.zip s3://${bucket}/packages
+    aws s3 cp snow_lambda.zip s3://${bucket}/packages
     dirsToUpload=("databases" "functions" "iac")
-    for i in ${dirsToUpload[@]}; do
-        aws s3 cp ./$i s3://${bucket} --recursive
+    for dir in ${dirsToUpload[@]}; do
+        aws s3 cp ./${dir} s3://${bucket}/${dir} --recursive
     done
 
     # use the cloudformation template to create s3 raw and curated buckets
