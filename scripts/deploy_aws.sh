@@ -88,7 +88,7 @@ function create_code_deploy_bucket() {
         --template-body file://${TEMPLATE_PATH}/code_deploy_s3_bucket.yaml \
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-            ParameterKey=Environment,ParameterValue=${ENVIRONMENT,,} \
+            ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region ${AWS_REGION}
         sleep 30
     fi
@@ -138,13 +138,13 @@ function deploy() {
     get_all_stacks
 
     # create IAM roles, policies, and groups
-    create_iam ${PROJECT_NAME}-iam-${ENVIRONMENT,,}
+    create_iam ${PROJECT_NAME}-iam-${ENVIRONMENT}
 
     # create S3 code deploy bucket and deploy artifacts
-    local code_deploy_bucket=$(create_code_deploy_bucket ${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT,,})
+    local code_deploy_bucket=$(create_code_deploy_bucket ${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT})
     deploy_artifacts ${code_deploy_bucket}
 
-    # local code_deploy_stack_name=${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT,,}
+    # local code_deploy_stack_name=${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT}
 
     # # creating a stack if the stack does not exist already
     # stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${code_deploy_stack_name}')].StackName" --output text)
@@ -153,13 +153,13 @@ function deploy() {
     #     --template-body file://${TEMPLATE_PATH}/code_deploy_s3_bucket.yaml \
     #     --parameters \
     #         ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-    #         ParameterKey=Environment,ParameterValue=${ENVIRONMENT,,} \
+    #         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
     #     --region ${AWS_REGION}
     #     sleep 30
     # fi
 
     # local layer="Raw"
-    # local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT,,}
+    # local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT}
 
     # # creating a stack if the stack does not exist already
     # stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].StackName" --output text)
@@ -209,7 +209,7 @@ function deploy() {
 USER=$(whoami)
 SCRIPT=${0}
 SCRIPT_DIR_PATH="${0%/*}"
-ENVIRONMENT=${1}
+ENVIRONMENT=${1,,}
 
 source ${SCRIPT_DIR_PATH}/logger.sh
 
