@@ -132,24 +132,38 @@ function deploy() {
     #local code_deploy_bucket=$(create_code_deploy_bucket)
     #deploy_artifacts ${code_deploy_bucket}
 
-    local layer="Raw"
-    local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT,,}
+    local code_deploy_stack_name=${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT,,}
 
     # creating a stack if the stack does not exist already
-    stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].StackName" --output text)
-    if [[ ${stack} != ${stack_name} ]]; then
-        aws cloudformation create-stack --stack-name ${stack_name} \
-        --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
+    stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${code_deploy_stack_name}')].StackName" --output text)
+    if [[ ${stack} != ${code_deploy_stack_name} ]]; then
+        aws cloudformation create-stack --stack-name ${code_deploy_stack_name} \
+        --template-body file://${TEMPLATE_PATH}/code_deploy_s3_bucket.yaml \
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-            ParameterKey=DataLayer,ParameterValue=${layer} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region us-east-1
         sleep 30
     fi
 
+    # local layer="Raw"
+    # local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT,,}
+
+    # # creating a stack if the stack does not exist already
+    # stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].StackName" --output text)
+    # if [[ ${stack} != ${stack_name} ]]; then
+    #     aws cloudformation create-stack --stack-name ${stack_name} \
+    #     --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
+    #     --parameters \
+    #         ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
+    #         ParameterKey=DataLayer,ParameterValue=${layer} \
+    #         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
+    #     --region us-east-1
+    #     sleep 30
+    # fi
+
     # upload all artifacts and files to aws
-    bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
+    bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${code_deploy_stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}/packages
     aws s3 cp snow_lambda.zip s3://${bucket}/packages
     dirsToUpload=("databases" "functions" "iac")

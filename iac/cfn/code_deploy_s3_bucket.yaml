@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Code deploy S3 bucket
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: "Project name"
+    Default: "arch_prj"
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - uat
+      - prod
+    Description: "Select an environment"
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment,
+          !Select [0, !Split [-, !Select [2, !Split [/, !Ref AWS::StackId ]]]]
+        ]
+      ]
+      Tags:
+        - Key: env
+          Value: !Ref Environment
+        - Key: proj
+          Value: !Ref ProjectName
+        - Key: type
+          Value: code-deploy-artifacts
+
+Outputs:
+  BucketName:
+    Description: Name of code deploy bucket
+    Value: !Ref S3Bucket

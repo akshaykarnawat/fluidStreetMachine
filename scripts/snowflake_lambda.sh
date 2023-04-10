@@ -20,11 +20,22 @@ function create_and_activate_virtual_env() {
 ###############################################################################
 # install_dependencies
 # install dependencies in the virtual python environment
+#
+# Note: platform specific dependencies are installed in the virtual environment
+# allowing this to work with lambda functions.
 ###############################################################################
 function install_dependencies() {
     local site_pkg_dir=./${ENV_NAME}/lib/python3.*/site-packages/
+
     cd ${site_pkg_dir}
-    pip3 install --upgrade --platform ${PLATFORM} --only-binary=:all: ${PACKAGE} --target .
+
+    # install python package dependencies
+    pip3 install --upgrade \
+    --platform ${PLATFORM} \
+    --only-binary=:all: ${PY_PACKAGES} \
+    --target .
+
+    # recursively give access to read and execute the package files
     chmod -R 755 .
 }
 
@@ -34,7 +45,11 @@ function install_dependencies() {
 ###############################################################################
 function create_packaged_zip() {
     local zip_file_location=~/workspace/${ENV_NAME}.zip
+
+    # zip all packages
     zip -r9 ${zip_file_location} .
+
+    # append the lambda files to the zip ignoring the path
     zip -jg ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/*
 }
 
@@ -54,7 +69,7 @@ RUN_LOG_FILE=$(logger::init ${APP_PATH}/logs snowflake_lambda)
 CURRENT_TIME="$(date +'%Y%m%d%H%M%S')"
 
 PLATFORM=manylinux_2_12_x86_64
-PACKAGE=snowflake-connector-python
+PY_PACKAGES=snowflake-connector-python
 
 create_and_activate_virtual_env
 install_dependencies
