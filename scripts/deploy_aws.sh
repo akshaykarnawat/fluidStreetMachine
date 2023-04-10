@@ -133,7 +133,7 @@ function deploy() {
     #deploy_artifacts ${code_deploy_bucket}
 
     local layer="Raw"
-    local stack_name=${PROJECT_NAME}-s3-bucket-${layer}-${ENVIRONMENT}
+    local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT,,}
 
     # creating a stack if the stack does not exist already
     stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].StackName" --output text)
@@ -152,7 +152,7 @@ function deploy() {
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
     aws s3 cp artifact.zip s3://${bucket}
     aws s3 cp snow_lambda.zip s3://${bucket}
-    dirsToUpload=("databases" "functions" "iac/cfn")
+    dirsToUpload=("databases" "functions" "iac")
     for i in ${dirsToUpload[@]}; do
         aws s3 cp ./$i s3://${bucket} --recursive
     done
