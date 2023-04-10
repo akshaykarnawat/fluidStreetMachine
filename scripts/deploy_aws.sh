@@ -24,7 +24,7 @@ function get_all_stacks() {
 }
 
 ###############################################################################
-# search_stacks
+# describe_stacks
 # search the stacks given the following arguments
 #
 # Arguments:
@@ -34,7 +34,7 @@ function get_all_stacks() {
 #   stack_information: stack info after query filter in desired output mode
 #
 ###############################################################################
-function search_stacks() {
+function describe_stacks() {
     local query=${1}
     local output_mode=${2}
     aws cloudformation describe-stacks --query "${query}" --output ${output_mode}
@@ -54,7 +54,7 @@ function create_iam() {
     local stack_name=${1}
 
     # check to see if the stack exists already
-    stack=$(search_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
+    stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
 
     if [[ ${stack} != ${stack_name} ]]; then
         aws cloudformation create-stack --stack-name ${stack_name} \
@@ -65,7 +65,7 @@ function create_iam() {
         --region ${AWS_REGION}
     fi
 
-    echo $(search_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
+    echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
 }
 
 ###############################################################################
@@ -82,7 +82,7 @@ function create_code_deploy_bucket() {
     local stack_name=${1}
 
     # check to see if the stack exists already
-    stack=$(search_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
+    stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     if [[ ${stack} != ${stack_name} ]]; then
         aws cloudformation create-stack --stack-name ${stack_name} \
         --template-body file://${TEMPLATE_PATH}/code_deploy_s3_bucket.yaml \
@@ -93,7 +93,7 @@ function create_code_deploy_bucket() {
         sleep 30
     fi
 
-    echo $(search_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" text)
+    echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" text)
 }
 
 ###############################################################################
@@ -117,6 +117,36 @@ function deploy_artifacts() {
         aws s3 cp ./${dir} s3://${code_deploy_bucket}/${dir} --recursive
     done
 
+}
+
+###############################################################################
+# create_data_bucket
+# Create data bucket for the given data layer
+#
+# Arguments:
+#   stack_name: name of stack
+#   data_layer: raw or curated data layer
+# Returns:
+#   bucket: bucket name
+#
+###############################################################################
+function create_data_bucket() {
+    local stack_name=${1}
+    local data_layer=${2}
+
+    stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
+    if [[ ${stack} != ${stack_name} ]]; then
+        aws cloudformation create-stack --stack-name ${stack_name} \
+        --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
+        --parameters \
+            ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
+            ParameterKey=DataLayer,ParameterValue=${data_layer} \
+            ParameterKey=Environment,ParameterValue=${ENVIRONMENT^} \
+        --region ${AWS_REGION}
+        sleep 30
+    fi
+
+    echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" text)
 }
 
 ###############################################################################
@@ -144,62 +174,20 @@ function deploy() {
     local code_deploy_bucket=$(create_code_deploy_bucket ${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT})
     deploy_artifacts ${code_deploy_bucket}
 
-    # local code_deploy_stack_name=${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT}
-
-    # # creating a stack if the stack does not exist already
-    # stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${code_deploy_stack_name}')].StackName" --output text)
-    # if [[ ${stack} != ${code_deploy_stack_name} ]]; then
-    #     aws cloudformation create-stack --stack-name ${code_deploy_stack_name} \
-    #     --template-body file://${TEMPLATE_PATH}/code_deploy_s3_bucket.yaml \
-    #     --parameters \
-    #         ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-    #         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-    #     --region ${AWS_REGION}
-    #     sleep 30
-    # fi
-
-    # local layer="Raw"
-    # local stack_name=${PROJECT_NAME}-s3-bucket-${layer,,}-${ENVIRONMENT}
-
-    # # creating a stack if the stack does not exist already
-    # stack=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${stack_name}')].StackName" --output text)
-    # if [[ ${stack} != ${stack_name} ]]; then
-    #     aws cloudformation create-stack --stack-name ${stack_name} \
-    #     --template-body file://${TEMPLATE_PATH}/s3_bucket.yaml \
-    #     --parameters \
-    #         ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-    #         ParameterKey=DataLayer,ParameterValue=${layer} \
-    #         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-    #     --region ${AWS_REGION}
-    #     sleep 30
-    # fi
-
-    # upload all artifacts and files to aws
-    # bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${code_deploy_stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
-
-    # local all_artifacts_zip_key=packages/artifact.zip
-    # aws s3 cp artifact.zip s3://${bucket}/${all_artifacts_zip_key}
-
-    # local snow_lambda_key=packages/snow_lambda.zip
-    # aws s3 cp snow_lambda.zip s3://${bucket}/${snow_lambda_key}
-
-    # dirsToUpload=("databases" "functions" "iac")
-    # for dir in ${dirsToUpload[@]}; do
-    #     aws s3 cp ./${dir} s3://${bucket}/${dir} --recursive
-    # done
-
-    # use the cloudformation template to create s3 raw and curated buckets
-
-    # then use cloudformation to deploy the creation of step functions, lambda, etc.
-
-    # update lambda function codebase with the packaged version here
-    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
-    [[ -n lambda_function ]] && \
-    aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION}--s3-bucket ${code_deploy_bucket} --s3-key ${snow_lambda_key}
+    # create s3 raw and curated buckets
+    create_data_bucket ${PROJECT_NAME}-s3-bucket-raw-${ENVIRONMENT} Raw
+    create_data_bucket ${PROJECT_NAME}-s3-bucket-curated-${ENVIRONMENT} Curated
 
     # deploy the clodformation templates for glue job
+    #deploy_glue
 
-    # deploy the cloudformation templates for xyz
+    # create step functions, lambda functions, and event bridge from cloudformation template
+    # todo...
+
+    # update lambda function codebase with the snow_lambda package
+    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
+    [[ -n lambda_function ]] && \
+    aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION}--s3-bucket ${code_deploy_bucket} --s3-key packages/snow_lambda.zip
 
 }
 
