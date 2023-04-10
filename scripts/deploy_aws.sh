@@ -82,7 +82,7 @@ function create_code_deploy_bucket() {
     stack=$(search_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
 
     if [[ ${stack} != ${stack_name} ]]; then
-
+        echo todo
         # todo: create the s3 bucket with the codedeploy specific name
     fi
 
