@@ -110,7 +110,7 @@ function deploy_artifacts() {
     SNOW_LAMBDA_KEY=packages/snow_lambda.zip
 
     aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
-    aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${snow_lambda_key}
+    aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${SNOW_LAMBDA_KEY}
 
     dirsToUpload=("databases" "functions" "iac")
     for dir in ${dirsToUpload[@]}; do
