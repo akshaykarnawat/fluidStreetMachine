@@ -138,7 +138,7 @@ function deploy() {
     get_all_stacks
 
     # create IAM roles, policies, and groups
-    create_iam
+    create_iam ${PROJECT_NAME}-iam-${ENVIRONMENT,,}
 
     # create S3 code deploy bucket and deploy artifacts
     local code_deploy_bucket=$(create_code_deploy_bucket ${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT,,})
