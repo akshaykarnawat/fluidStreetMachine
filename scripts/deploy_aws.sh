@@ -105,7 +105,7 @@ function create_code_deploy_bucket() {
 #
 ###############################################################################
 function deploy_artifacts() {
-    local code_deploy_bucket=${1}
+    local code_deploy_bucket="${1}"
     local all_artifacts_zip_key=packages/artifact.zip
     SNOW_LAMBDA_KEY=packages/snow_lambda.zip
 
@@ -172,6 +172,7 @@ function deploy() {
 
     # create S3 code deploy bucket and deploy artifacts
     local code_deploy_bucket=$(create_code_deploy_bucket ${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT})
+    echo $code_deploy_bucket
     deploy_artifacts ${code_deploy_bucket}
 
     # create s3 raw and curated buckets
