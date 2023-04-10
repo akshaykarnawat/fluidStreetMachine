@@ -188,6 +188,7 @@ function deploy() {
     [[ -n lambda_function ]] && \
     aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
 
+    sleep 15
     # update handler for the lambda function
     local handler_name=run_snowflake_transformations.lambda_handler
     aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
