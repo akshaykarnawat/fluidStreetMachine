@@ -164,8 +164,13 @@ function deploy() {
 
     # upload all artifacts and files to aws
     bucket=$(aws cloudformation describe-stacks --query "Stacks[?contains(StackName,'${code_deploy_stack_name}')].Outputs[0][?contains(OutputKey, 'BucketName')].OutputValue" --output text)
-    aws s3 cp artifact.zip s3://${bucket}/packages
-    aws s3 cp snow_lambda.zip s3://${bucket}/packages
+    
+    local all_artifacts_zip_key=packages/artifact.zip
+    aws s3 cp artifact.zip s3://${bucket}/${all_artifacts_zip_key}
+
+    local snow_lambda_key=packages/snow_lambda.zip
+    aws s3 cp snow_lambda.zip s3://${bucket}/${snow_lambda_key}
+
     dirsToUpload=("databases" "functions" "iac")
     for dir in ${dirsToUpload[@]}; do
         aws s3 cp ./${dir} s3://${bucket}/${dir} --recursive
@@ -178,7 +183,7 @@ function deploy() {
     # update lambda function codebase with the packaged version here
     lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
     [[ -n lambda_function ]] && \
-    aws lambda update-function-code --function-name ${lambda_function} --region us-east-1 --s3-bucket ${bucket} --s3-key snow_lambda.zip
+    aws lambda update-function-code --function-name ${lambda_function} --region us-east-1 --s3-bucket ${bucket} --s3-key ${snow_lambda_key}
 
     # deploy the clodformation templates for glue job
 
