@@ -181,13 +181,15 @@ function deploy() {
     # deploy the clodformation templates for glue job
     #deploy_glue
 
-    # create step functions, lambda functions, and event bridge from cloudformation template
-    # todo...
-
+    # create step functions, lambda functions, and event bridge from cloudformation template -- todo
     # update lambda function codebase with the snow_lambda package
     lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
     [[ -n lambda_function ]] && \
     aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
+
+    # update handler for the lambda function
+    local handler_name=run_snowflake_transformations.lambda_handler
+    aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
 
 }
 
