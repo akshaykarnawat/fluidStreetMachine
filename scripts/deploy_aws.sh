@@ -185,7 +185,8 @@ function deploy() {
     # create step functions, lambda functions, and event bridge from cloudformation template -- todo
     # update lambda function codebase with the snow_lambda package
     echo "Updating function's code" 
-    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
+    local function_name=Snowflake
+    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, '${function_name}')].FunctionName" --output text)
     [[ -n lambda_function ]] && \
     aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
 
