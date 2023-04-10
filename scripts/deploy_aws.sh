@@ -20,7 +20,7 @@ function get_all_stacks() {
     aws cloudformation list-stacks \
     --stack-status-filter "${filter}" \
     --query "StackSummaries[].StackName" \
-    --output text
+    --output json
 }
 
 ###############################################################################
@@ -132,7 +132,7 @@ function deploy() {
     #local code_deploy_bucket=$(create_code_deploy_bucket)
     #deploy_artifacts ${code_deploy_bucket}
 
-    local layer="raw"
+    local layer="Raw"
     local stack_name=${PROJECT_NAME}-s3-bucket-${layer}-${ENVIRONMENT}
 
     # creating a stack if the stack does not exist already
