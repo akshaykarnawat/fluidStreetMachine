@@ -107,7 +107,7 @@ function create_code_deploy_bucket() {
 function deploy_artifacts() {
     local code_deploy_bucket=${1}
     local all_artifacts_zip_key=packages/artifact.zip
-    local snow_lambda_key=packages/snow_lambda.zip
+    SNOW_LAMBDA_KEY=packages/snow_lambda.zip
 
     aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
     aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${snow_lambda_key}
@@ -187,7 +187,7 @@ function deploy() {
     # update lambda function codebase with the snow_lambda package
     lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, 'Snowflake')].FunctionName" --output text)
     [[ -n lambda_function ]] && \
-    aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION}--s3-bucket ${code_deploy_bucket} --s3-key packages/snow_lambda.zip
+    aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
 
 }
 
