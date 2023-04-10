@@ -141,7 +141,7 @@ function deploy() {
         --template-body file://${TEMPLATE_PATH}/code_deploy_s3_bucket.yaml \
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-            ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
+            ParameterKey=Environment,ParameterValue=${ENVIRONMENT,,} \
         --region us-east-1
         sleep 30
     fi
