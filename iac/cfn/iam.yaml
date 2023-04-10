@@ -1,0 +1,153 @@
+---
+Parameters:
+  Users:
+    Type: List<String>
+    Description: "If more than one user requires access, please list each username separated by a comma"
+  ProjectName:
+    Type: String
+    Description: "Project name"
+    Default: "arch_prj"
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - uat
+      - prod
+
+Resources:
+  createGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Join ["-",[ "Group", !Ref Environment, !Ref ProjectName]]
+      Path: '/'
+
+  createPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Join ["-",[ !Ref Environment, !Ref ProjectName]]
+      PolicyDocument:
+        Statement:
+          - Action:
+              - appflow:DescribeFlow
+              - appflow:DescribeFlowExecutionRecords
+              - appflow:ListFlows
+              - athena:GetQueryExecution
+              - athena:GetQueryResults
+              - athena:GetQueryRuntimeStatistics
+              - athena:GetWorkGroup
+              - athena:ListQueryExecutions
+              - athena:StartQueryExecution
+              - athena:StopQueryExecution
+              - cloudformation:DescribeStacks
+              - cloudformation:GetTemplateSummary
+              - cloudformation:CreateStack
+              - cloudformation:DeleteStack
+              - cloudtrail:LookupEvents
+              - cloudwatch:*
+              - databrew:*
+              - dataexchange:*
+              - dynamodb:ListTables
+              - ec2:*
+              - glue:*
+              - iam:*
+              - kms:*
+              - logs:*
+              - organizations:*
+              - rds:*
+              - redshift:*
+              - redshift-data:*
+              - s3:*
+              - secretsmanager:*
+              - sqs:*
+              - sts:GetCallerIdentity
+              - tag:GetResources
+            Effect: Allow
+            Resource: "*"
+
+          - Action: kms:GenerateDataKey
+            Condition:
+              StringLike:
+                kms:ViaService: s3.*.amazonaws.com
+            Effect: Allow
+            Resource: "*"
+
+          - Action: ec2:RunInstances
+            Effect: Allow
+            Resource:
+              - arn:aws:ec2:*:*:image/*
+              - arn:aws:ec2:*:*:instance/*
+              - arn:aws:ec2:*:*:key-pair/*
+              - arn:aws:ec2:*:*:network-interface/*
+              - arn:aws:ec2:*:*:security-group/*
+              - arn:aws:ec2:*:*:subnet/*
+              - arn:aws:ec2:*:*:volume/*
+
+          - Action: glue:CreateConnection
+            Effect: Allow
+            Resource:
+              - arn:aws:glue:*:*:catalog
+              - arn:aws:glue:*:*:connection/AwsGlueDataBrew-*
+
+          - Action: glue:CreateTable
+            Effect: Allow
+            Resource:
+              - arn:aws:glue:*:*:catalog
+              - arn:aws:glue:*:*:database/*
+              - arn:aws:glue:*:*:table/*/awsgluedatabrew*
+
+          - Action: glue:GetDatabases
+            Effect: Allow
+            Resource:
+              - arn:aws:glue:*:*:catalog
+      Groups:
+        - !Join ["-",[ "Group", !Ref Environment, !Ref ProjectName]]
+
+  createEC2Policies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Join ["-",[ !Ref Environment, !Ref ProjectName , "ec2-zeppelin-access"]]
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ec2:CreateTags
+              - ec2:DeleteTags
+              - ec2:TerminateInstances
+            Condition:
+              StringEquals:
+                ec2:ResourceTag/aws:cloudformation:logical-id: ZeppelinInstance
+              StringLike:
+                ec2:ResourceTag/aws:cloudformation:stack-id: arn:aws:cloudformation:*:*:stack/aws-glue-*/*
+            Effect: Allow
+            Resource: arn:aws:ec2:*:*:instance/*
+          - Action: iam:PassRole
+            Condition:
+              StringEquals:
+                iam:PassedToService:
+                  - databrew.amazonaws.com
+            Effect: Allow
+            Resource: arn:aws:iam::*:role/*
+          - Action: iam:PassRole
+            Condition:
+              StringLike:
+                iam:PassedToService:
+                  - ec2.amazonaws.com
+            Effect: Allow
+            Resource: arn:aws:iam::*:role/AWSGlueServiceNotebookRole*
+          - Action: iam:PassRole
+            Condition:
+              StringLike:
+                iam:PassedToService:
+                  - glue.amazonaws.com
+            Effect: Allow
+            Resource:
+              - arn:aws:iam::*:role/AWSGlueServiceRole*
+              - arn:aws:iam::*:role/service-role/AWSGlueServiceRole*
+      Groups:
+        - !Join ["-",[ "Group", !Ref Environment, !Ref ProjectName]]
+
+  addUserToGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    DependsOn: createGroup
+    Properties:
+      GroupName: !Join ["-",[ "Group", !Ref Environment, !Ref ProjectName]]
+      Users: !Ref Users
