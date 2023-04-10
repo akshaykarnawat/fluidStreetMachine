@@ -89,7 +89,7 @@ function create_code_deploy_bucket() {
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        --region ${AWS_REGION}
+        --region ${AWS_REGION} 1>&2
         sleep 30
     fi
 
@@ -142,7 +142,7 @@ function create_data_bucket() {
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=DataLayer,ParameterValue=${data_layer} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT^} \
-        --region ${AWS_REGION}
+        --region ${AWS_REGION} 1>&2
         sleep 30
     fi
 
