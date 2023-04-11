@@ -109,7 +109,8 @@ function deploy_artifacts() {
     local all_artifacts_zip_key=packages/artifact.zip
     SNOW_LAMBDA_KEY=packages/snow_lambda.zip
 
-    aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
+    aws s3 sync --delete ./artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
+    # aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
     aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${SNOW_LAMBDA_KEY}
 
     dirsToUpload=("databases" "functions" "iac")
@@ -175,14 +176,14 @@ function deploy_orchestration() {
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
 
     # update the codebase for Matillion job
-    local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'Matillion')].OutputValue" text)
+    local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'MatillionJobRunner')].OutputValue" text)
     [[ -n matillion_job_function ]] && \
     aws lambda update-function-code --function-name ${matillion_job_function} \
     --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
     --s3-key ${SNOW_LAMBDA_KEY}
 
     # update the codebase for Snowflake job
-    local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'Snowflake')].OutputValue" text)
+    local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'SnowflakeRunner')].OutputValue" text)
     [[ -n snowflake_job_function ]] && \
     aws lambda update-function-code --function-name ${snowflake_job_function} \
     --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
