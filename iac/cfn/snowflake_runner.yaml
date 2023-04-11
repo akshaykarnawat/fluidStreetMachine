@@ -153,7 +153,7 @@ Resources:
       DefinitionS3Location:
         Bucket:
           Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
-        Key: ELTStateMachine.asl.json
+        Key: jobs/step_functions/ELTStateMachine.asl.json
       DefinitionSubstitutions:
         MatillionLambdaFunctionArn: !GetAtt MatillionLambdaFunction.Arn
         SnowflakeLambdaFunctionArn: !GetAtt SnowflakeLambdaFunction.Arn
