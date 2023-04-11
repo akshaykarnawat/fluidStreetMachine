@@ -41,6 +41,7 @@ def lambda_handler(event, context):
     """
     Lambda function handler
     """
+    validate_event(event)
     group = event.get("group")
     project = event.get("project")
     job = event.get("job")
