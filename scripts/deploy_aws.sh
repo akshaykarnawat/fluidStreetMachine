@@ -168,7 +168,7 @@ function deploy_orchestration() {
     if [[ ${stack} != ${stack_name} ]]; then
         echo Input to the stack is \"${execution_input//\"/\\\"}\"
         aws cloudformation create-stack --stack-name ${stack_name} \
-        --template-body file://${TEMPLATE_PATH}/snowflake_runner.yaml \
+        --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml \
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
