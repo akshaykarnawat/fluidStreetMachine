@@ -172,7 +172,7 @@ function deploy_orchestration() {
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-            ParameterKey=ExecutionInput,ParameterValue="${execution_input//\"/\\\"}" \
+            ParameterKey=ExecutionInput,ParameterValue="${execution_input}" \
         --region ${AWS_REGION} --capabilities CAPABILITY_IAM
         sleep 30
     fi
