@@ -162,17 +162,18 @@ function deploy_orchestration() {
     local stack_name=${1}
     local code_deploy_bucket=${2}
     local execution_input=$(echo $(cat "${3}"))
-
+    execution_input=\"${execution_input//\"/\\\"}\"
+    
     stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     # if the stack does not exist create it, else update the stack's function
     if [[ ${stack} != ${stack_name} ]]; then
-        echo Input to the stack is \"${execution_input//\"/\\\"}\"
+        echo Input to the stack is ${execution_input}
         aws cloudformation create-stack --stack-name ${stack_name} \
         --template-body file://${TEMPLATE_PATH}/snowflake_runner.yaml \
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-            ParameterKey=ExecutionInput,ParameterValue="${execution_input}" \
+            ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
         --region ${AWS_REGION} --capabilities CAPABILITY_IAM
         sleep 30
     fi
