@@ -150,7 +150,49 @@ function create_data_bucket() {
 }
 
 ###############################################################################
-# deploy
+# deploy_orchestration
+# Create Step functions, lambda, and event bridge
+#
+# Arguments:
+#   stack_name: name of stack
+#   code_deploy_bucket: name of S3 bucket with code artifacts
+#
+###############################################################################
+function deploy_orchestration() {
+    local stack_name=${1}
+    local code_deploy_bucket=${2}
+
+    stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
+    # if the stack does not exist create it, else update the stack's function
+    if [[ ${stack} != ${stack_name} ]]; then
+        aws cloudformation create-stack --stack-name ${stack_name} \
+        --template-body file://${TEMPLATE_PATH}/snowflake_runner.yaml \
+        --parameters \
+            ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
+            ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
+        --region ${AWS_REGION} 1>&2
+        sleep 30
+    fi
+    # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
+
+    # update the codebase for Matillion job
+    local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'Matillion')].OutputValue" text)
+    [[ -n matillion_job_function ]] && \
+    aws lambda update-function-code --function-name ${matillion_job_function} \
+    --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
+    --s3-key ${SNOW_LAMBDA_KEY}
+
+    # update the codebase for Snowflake job
+    local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'Snowflake')].OutputValue" text)
+    [[ -n snowflake_job_function ]] && \
+    aws lambda update-function-code --function-name ${snowflake_job_function} \
+    --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
+    --s3-key ${SNOW_LAMBDA_KEY}
+
+}
+
+###############################################################################
+# deploy_all
 # AWS deployment for the following items:
 # [-] IAM Roles, policies, groups, etc.
 # [-] Code deploy S3 bucket and deploy packaged artifacts
@@ -162,7 +204,7 @@ function create_data_bucket() {
 #   template_path: location of aws cloudformation templates
 #
 ###############################################################################
-function deploy() {
+function deploy_all() {
 
     echo All the stacks currently deployed:
     get_all_stacks
@@ -172,7 +214,7 @@ function deploy() {
 
     # create S3 code deploy bucket and deploy artifacts
     local code_deploy_bucket=$(create_code_deploy_bucket ${PROJECT_NAME}-code-deploy-s3-bucket-${ENVIRONMENT})
-    echo $code_deploy_bucket
+    echo ${code_deploy_bucket}
     deploy_artifacts ${code_deploy_bucket}
 
     # create s3 raw and curated buckets
@@ -182,19 +224,13 @@ function deploy() {
     # deploy the clodformation templates for glue job
     #deploy_glue
 
-    # create step functions, lambda functions, and event bridge from cloudformation template -- todo
-    # update lambda function codebase with the snow_lambda package
-    echo "Updating function's code"
-    local function_name=SnowflakeSQLTransformationJob
-    lambda_function=$(aws lambda list-functions --query "Functions[?contains(FunctionName, '${function_name}')].FunctionName" --output text)
-    [[ -n lambda_function ]] && \
-    aws lambda update-function-code --function-name ${lambda_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
+    # create step functions, lambda functions, and event bridge from cloudformation template
+    deploy_orchestration generation-data-ELT-state-machine-${ENVIRONMENT} ${code_deploy_bucket}
 
-    sleep 15
-    # update handler for the lambda function
-    echo "Updating function's lambda handler"
-    local handler_name=snowflake_transformation.lambda_handler
-    aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
+    # # update handler for the lambda function
+    # echo "Updating function's lambda handler"
+    # local handler_name=snowflake_transformation.lambda_handler
+    # aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
 
 }
 
@@ -221,4 +257,4 @@ logger::log [INFO] "=======================================" ${DEPLOY_LOG_FILE}
 
 TEMPLATE_PATH=${APP_PATH}/iac/cfn
 AWS_REGION=us-east-1
-deploy
+deploy_all

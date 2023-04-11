@@ -133,3 +133,11 @@ Resources:
         S3Bucket:
           Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
+
+Outputs:
+  MatillionFunction:
+    Description: Name of Matillion job runner lambda function
+    Value: !Ref MatillionLambdaFunction
+  SnowflakeFunction:
+    Description: Name of Snowflake transformation job lambda function
+    Value: !Ref SnowflakeLambdaFunction
