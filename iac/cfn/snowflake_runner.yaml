@@ -77,7 +77,7 @@ Resources:
       Timeout: 600
       Code:
         S3Bucket:
-          Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
+          Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
 
   MatillionLambdaFunctionRole:
@@ -131,7 +131,7 @@ Resources:
       Timeout: 600
       Code:
         S3Bucket:
-          Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
+          Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
 
   ELTStateMachineExecutionRole:
@@ -149,21 +149,11 @@ Resources:
   ELTStateMachine:
     Type: 'AWS::StepFunctions::StateMachine'
     Properties:
-      DefinitionString: |-
-        {
-          "Comment": "An example of the Amazon States Language for scheduling a task.",
-          "StartAt": "Wait for Timer",
-          "States": {
-            "Wait for Timer": {
-              "Type": "Wait",
-              "SecondsPath": "$.timer_seconds",
-              "Next": "Success"
-            },
-            "Success": {
-              "Type": "Succeed"
-            }
-          }
-        }
+      StateMachineName: GenerationELTStateMachine
+      DefinitionS3Location:
+        Bucket: 
+          Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
+        Key: ELTStateMachine.asl.json
       RoleArn: !GetAtt ELTStateMachineExecutionRole.Arn
 
 Outputs:

@@ -1,0 +1,80 @@
+{
+  "Comment": "Generation ELT data orchestration ",
+  "StartAt": "MatillionWorkflows",
+  "States": {
+    "MatillionWorkflows": {
+      "Type": "Map",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "RunMatillionJob",
+        "States": {
+          "RunMatillionJob": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "${MatillionLambdaFunctionArn}"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "End": true,
+            "ResultPath": null
+          }
+        }
+      },
+      "Next": "SnowflakeScripts",
+      "ItemsPath": "$.matillionWorkflows",
+      "ResultPath": null
+    },
+    "SnowflakeScripts": {
+      "Type": "Map",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "INLINE"
+        },
+        "StartAt": "RunSnowflakeSQLScript",
+        "States": {
+          "RunSnowflakeSQLScript": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "${SnowflakeLambdaFunctionArn}"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "End": true,
+            "ResultPath": null
+          }
+        }
+      },
+      "End": true,
+      "ItemsPath": "$.snowflakeTransformations",
+      "ResultPath": null
+    }
+  }
+}

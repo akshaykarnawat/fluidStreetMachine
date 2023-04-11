@@ -112,7 +112,7 @@ function deploy_artifacts() {
     aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
     aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${SNOW_LAMBDA_KEY}
 
-    dirsToUpload=("databases" "functions" "iac")
+    dirsToUpload=("databases" "functions" "iac" "jobs/step_functions")
     for dir in ${dirsToUpload[@]}; do
         aws s3 sync --delete ./${dir} s3://${code_deploy_bucket}/${dir}
     done

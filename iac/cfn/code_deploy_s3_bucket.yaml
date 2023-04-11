@@ -35,4 +35,4 @@ Outputs:
     Description: Name of code deploy bucket
     Value: !Ref S3Bucket
     Export:
-      Name: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
+      Name: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
