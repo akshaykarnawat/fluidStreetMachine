@@ -2,17 +2,21 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ELT state machine for running Matillion jobs and Snowflake transformations
 
 Parameters:
-  # ProjectName:
-  #   Type: String
-  #   Description: 'Project name'
-  #   Default: 'arch_prj'
+  ProjectName:
+    Type: String
+    Description: 'Project name'
+    Default: 'arch_prj'
   Environment:
     Type: String
+    Description: 'Select an environment'
     AllowedValues:
       - dev
       - uat
       - prod
-    Description: 'Select an environment'
+  ExecutionInput:
+    Type: String
+    Description: 'ELT State Machine Execution Input (in JSON)'
+    Default: '{ }'
 
 Resources:
   SnowflakeLambdaFunctionRole:
@@ -69,7 +73,7 @@ Resources:
   SnowflakeLambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: SnowflakeRunner
+      FunctionName: !Join [ '-', [ "SnowflakeRunner", !Ref Environment ] ]
       Handler: snowflake_transformation.lambda_handler
       Runtime: python3.9
       Role: !GetAtt SnowflakeLambdaFunctionRole.Arn
@@ -79,6 +83,11 @@ Resources:
         S3Bucket:
           Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
+      Tags:
+        - Key: env
+          Value: !Ref Environment
+        - Key: proj
+          Value: !Ref ProjectName
 
   MatillionLambdaFunctionRole:
     Type: AWS::IAM::Role
@@ -123,7 +132,7 @@ Resources:
   MatillionLambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: MatillionJobRunner
+      FunctionName: !Join [ '-', [ "MatillionJobRunner", !Ref Environment ] ]
       Handler: matillion_job_runner.lambda_handler
       Runtime: python3.9
       Role: !GetAtt MatillionLambdaFunctionRole.Arn
@@ -133,6 +142,12 @@ Resources:
         S3Bucket:
           Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
+      Tags:
+        - Key: env
+          Value: !Ref Environment
+        - Key: proj
+          Value: !Ref ProjectName
+
 
   ELTStateMachineExecutionRole:
     Type: 'AWS::IAM::Role'
@@ -149,7 +164,7 @@ Resources:
   ELTStateMachine:
     Type: 'AWS::StepFunctions::StateMachine'
     Properties:
-      StateMachineName: GenerationELTStateMachine
+      StateMachineName: !Join [ '-', [ "GenerationELTStateMachine", !Ref Environment ] ]
       DefinitionS3Location:
         Bucket:
           Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
@@ -158,6 +173,11 @@ Resources:
         MatillionLambdaFunctionArn: !GetAtt MatillionLambdaFunction.Arn
         SnowflakeLambdaFunctionArn: !GetAtt SnowflakeLambdaFunction.Arn
       RoleArn: !GetAtt ELTStateMachineExecutionRole.Arn
+      Tags:
+        - Key: env
+          Value: !Ref Environment
+        - Key: proj
+          Value: !Ref ProjectName
 
   SchedulerRole:
     Type: 'AWS::IAM::Role'
@@ -183,16 +203,13 @@ Resources:
   NightlySchedule:
     Type: 'AWS::Scheduler::Schedule'
     Properties:
-      Name: DailyAtNight
+      Name: !Join [ '-', [ "DailyAtNight", !Ref Environment ] ]
       Description: 'Run the job daily at night'
-      ScheduleExpression: 'rate(24 hours)'
+      ScheduleExpression: 'cron(30 22 ? * * *)'
       FlexibleTimeWindow:
         Mode: 'OFF'
       Target:
-        Input: |
-          {
-
-          }
+        Input: !Ref ExecutionInput
         Arn: !GetAtt ELTStateMachine.Arn
         RoleArn: !GetAtt SchedulerRole.Arn
 
