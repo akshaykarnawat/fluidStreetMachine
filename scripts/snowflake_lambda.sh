@@ -44,13 +44,9 @@ function install_dependencies() {
 # install dependencies in the virtual python environment
 ###############################################################################
 function create_packaged_zip() {
-    local zip_file_location=~/workspace/${ENV_NAME}.zip
-
-    # zip all packages
-    zip -r9 ${zip_file_location} .
-
-    # append the lambda files to the zip ignoring the path
-    zip -jg ${zip_file_location} ${LAMBDA_FUNC_LOCATION}/*
+    # zip all packages and append the lambda files to the zip ignoring the path
+    zip -r9 ${ZIP_FILE_PATH} .
+    zip -jg ${ZIP_FILE_PATH} ${LAMBDA_FUNC_LOCATION}/*
 }
 
 ###############################################################################
@@ -61,6 +57,7 @@ SCRIPT=$0
 SCRIPT_DIR_PATH="${0%/*}"
 ENV_NAME=${1}
 LAMBDA_FUNC_LOCATION=${2}
+ZIP_FILE_PATH=${3}
 
 source ${SCRIPT_DIR_PATH}/logger.sh
 

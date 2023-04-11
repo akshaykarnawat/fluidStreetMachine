@@ -120,14 +120,14 @@ jobs:
           command: echo unit testing and code coverage of the build
       - run:
           name: Build snowflake lambda package
-          command: bash scripts/snowflake_lambda.sh snow_lambda ~/workspace/functions
+          command: bash scripts/snowflake_lambda.sh snow_lambda ~/workspace/functions ~/workspace/snow_lambda.zip
       - store_artifacts:
           path: ./snow_lambda.zip
           destination: snow_lambda
       - run:
           name: Build codebase
           command: |
-            zip -r ./artifact.zip . -x ".git/*" -x "venv/*" -x "schemachange/*" -x "snow_lambda/*"
+            zip -r ./artifact.zip . -x ".git/*" "venv/*" "schemachange/*" "snow_lambda/*"
             chmod 755 artifact.zip
       - store_artifacts:
           path: ./artifact.zip
