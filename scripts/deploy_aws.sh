@@ -168,7 +168,6 @@ function deploy_orchestration() {
         aws cloudformation create-stack --stack-name ${stack_name} \
         --template-body file://${TEMPLATE_PATH}/snowflake_runner.yaml \
         --parameters \
-            ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region ${AWS_REGION} 1>&2
         sleep 30
