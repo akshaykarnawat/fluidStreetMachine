@@ -109,7 +109,7 @@ function deploy_artifacts() {
     local all_artifacts_zip_key=packages/artifact.zip
     SNOW_LAMBDA_KEY=packages/snow_lambda.zip
 
-    aws s3 sync --delete . s3://${code_deploy_bucket}/packages/ --include artifact.zip snow_lambda.zip
+    aws s3 sync --delete . s3://${code_deploy_bucket}/packages/ --include artifact.zip --include snow_lambda.zip
     # aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
     # aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${SNOW_LAMBDA_KEY}
 
