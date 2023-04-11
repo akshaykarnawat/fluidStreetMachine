@@ -161,7 +161,7 @@ function create_data_bucket() {
 function deploy_orchestration() {
     local stack_name=${1}
     local code_deploy_bucket=${2}
-    local execution_input=\'$(cat ${3})\'
+    local execution_input=$(echo $(cat "${3}"))
 
     stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     # if the stack does not exist create it, else update the stack's function
@@ -223,7 +223,7 @@ function deploy_all() {
     #deploy_glue
 
     # create step functions, lambda functions, and event bridge from cloudformation template
-    deploy_orchestration "generation-data-ELT-state-machine-${ENVIRONMENT}" ${code_deploy_bucket} "./configs/step_functions/ELTStateMachie_input.json"
+    deploy_orchestration "generation-data-ELT-state-machine-${ENVIRONMENT}" ${code_deploy_bucket} "./configs/step_functions/ELTStateMachine_input.json"
 
     # # update handler for the lambda function
     # echo "Updating function's lambda handler"
