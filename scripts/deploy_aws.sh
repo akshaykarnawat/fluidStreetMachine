@@ -193,7 +193,7 @@ function deploy() {
     sleep 15
     # update handler for the lambda function
     echo "Updating function's lambda handler"
-    local handler_name=run_snowflake_transformations.lambda_handler
+    local handler_name=snowflake_transformation.lambda_handler
     aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
 
 }
