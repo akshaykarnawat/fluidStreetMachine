@@ -169,7 +169,7 @@ function deploy_orchestration() {
         --template-body file://${TEMPLATE_PATH}/snowflake_runner.yaml \
         --parameters \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        --region ${AWS_REGION}
+        --region ${AWS_REGION} --capabilities CAPABILITY_IAM
         sleep 30
     fi
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)

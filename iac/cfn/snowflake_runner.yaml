@@ -134,6 +134,38 @@ Resources:
           Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
 
+  ELTStateMachineExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: states.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/'
+
+  ELTStateMachine:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Properties:
+      DefinitionString: |-
+        {
+          "Comment": "An example of the Amazon States Language for scheduling a task.",
+          "StartAt": "Wait for Timer",
+          "States": {
+            "Wait for Timer": {
+              "Type": "Wait",
+              "SecondsPath": "$.timer_seconds",
+              "Next": "Success"
+            },
+            "Success": {
+              "Type": "Succeed"
+            }
+          }
+        }
+      RoleArn: !GetAtt ELTStateMachineExecutionRole.Arn
+
 Outputs:
   MatillionFunction:
     Description: Name of Matillion job runner lambda function
@@ -141,3 +173,9 @@ Outputs:
   SnowflakeFunction:
     Description: Name of Snowflake transformation job lambda function
     Value: !Ref SnowflakeLambdaFunction
+  ELTStateMachineArn:
+    Description: Name of ELT State Machine
+    Value: !Ref ELTStateMachine
+  # ExecutionInput:
+  #   Description: Sample input to StartExecution.
+  #   Value: '{ "timer_seconds": 10 }'
