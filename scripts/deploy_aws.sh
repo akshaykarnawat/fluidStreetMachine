@@ -168,7 +168,7 @@ function deploy_orchestration() {
     # if the stack does not exist create it, else update the stack's function
     if [[ ${stack} != ${stack_name} ]]; then
         echo Input to the stack is \"${execution_input//\"/\\\"}\"
-        aws cloudformation create-stack --stack-name ${stack_name} --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml --parameters ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} ParameterKey=Environment,ParameterValue=${ENVIRONMENT} ParameterKey=ExecutionInput,ParameterValue=\"${execution_input//\"/\\\"}\" --region ${AWS_REGION} --capabilities CAPABILITY_IAM
+        aws cloudformation create-stack --stack-name ${stack_name} --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml --parameters ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} ParameterKey=Environment,ParameterValue=${ENVIRONMENT} ParameterKey=ExecutionInput,ParameterValue="${execution_input//\"/\\\"}" --region ${AWS_REGION} --capabilities CAPABILITY_IAM
         sleep 30
     fi
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
