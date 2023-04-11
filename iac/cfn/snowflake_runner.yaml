@@ -151,7 +151,7 @@ Resources:
     Properties:
       StateMachineName: GenerationELTStateMachine
       DefinitionS3Location:
-        Bucket: 
+        Bucket:
           Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
         Key: ELTStateMachine.asl.json
       RoleArn: !GetAtt ELTStateMachineExecutionRole.Arn
