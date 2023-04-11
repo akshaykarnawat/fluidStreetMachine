@@ -109,13 +109,11 @@ function deploy_artifacts() {
     local all_artifacts_zip_key=packages/artifact.zip
     SNOW_LAMBDA_KEY=packages/snow_lambda.zip
 
-    aws s3 sync --delete . s3://${code_deploy_bucket}/packages/ --include artifact.zip --include snow_lambda.zip
-    # aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
-    # aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${SNOW_LAMBDA_KEY}
+    aws s3 cp artifact.zip s3://${code_deploy_bucket}/${all_artifacts_zip_key}
+    aws s3 cp snow_lambda.zip s3://${code_deploy_bucket}/${SNOW_LAMBDA_KEY}
 
     dirsToUpload=("databases" "functions" "iac")
     for dir in ${dirsToUpload[@]}; do
-        # aws s3 cp ./${dir} s3://${code_deploy_bucket}/${dir} --recursive
         aws s3 sync --delete ./${dir} s3://${code_deploy_bucket}/${dir}
     done
 
@@ -171,7 +169,7 @@ function deploy_orchestration() {
         --template-body file://${TEMPLATE_PATH}/snowflake_runner.yaml \
         --parameters \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        --region ${AWS_REGION} 1>&2
+        --region ${AWS_REGION}
         sleep 30
     fi
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
@@ -222,7 +220,7 @@ function deploy_all() {
     #deploy_glue
 
     # create step functions, lambda functions, and event bridge from cloudformation template
-    deploy_orchestration generation-data-ELT-state-machine-${ENVIRONMENT} ${code_deploy_bucket}
+    deploy_orchestration "generation-data-ELT-state-machine-${ENVIRONMENT}" ${code_deploy_bucket}
 
     # # update handler for the lambda function
     # echo "Updating function's lambda handler"
