@@ -163,7 +163,7 @@ function deploy_orchestration() {
     local code_deploy_bucket=${2}
     local execution_input=$(echo $(cat "${3}"))
     execution_input=\"${execution_input//\"/\\\"}\"
-    
+
     stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     # if the stack does not exist create it, else update the stack's function
     if [[ ${stack} != ${stack_name} ]]; then
