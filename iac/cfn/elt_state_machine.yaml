@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: ELT state machine -- runs matillion job and snowflake transformation queries
+Description: ELT state machine for running Matillion jobs and Snowflake transformations
 
 Resources:
   ELTStatesExecutionRole:

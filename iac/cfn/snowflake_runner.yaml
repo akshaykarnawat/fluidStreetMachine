@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ELT state machine for running Matillion jobs and Snowflake transformations
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: 'Project name'
+    Default: 'arch_prj'
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - uat
+      - prod
+    Description: 'Select an environment'
+
+Resources:
+  SnowflakeLambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: AppendToLogsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: "*"
+      - PolicyName: SecretsManagerReadOnlyPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - secretsmanager:GetResourcePolicy
+            - secretsmanager:GetSecretValue
+            - secretsmanager:DescribeSecret
+            - secretsmanager:ListSecretVersionIds
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - secretsmanager:ListSecrets
+            Resource: "*"
+      - PolicyName: S3ReadOnlyAccess
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:Get*
+            - s3:List*
+            - s3-object-lambda:Get*
+            - s3-object-lambda:List*
+            Resource: "*"
+
+  SnowflakeLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: SnowflakeRunner
+      Handler: snowflake_transformation.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt SnowflakeLambdaFunctionRole.Arn
+      MemorySize: 128
+      Timeout: 600
+      Code:
+        S3Bucket: 
+          Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
+        S3Key: packages/snow_lambda.zip
+
+  MatillionLambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: AppendToLogsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: "*"
+      - PolicyName: SecretsManagerReadOnlyPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - secretsmanager:GetResourcePolicy
+            - secretsmanager:GetSecretValue
+            - secretsmanager:DescribeSecret
+            - secretsmanager:ListSecretVersionIds
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - secretsmanager:ListSecrets
+            Resource: "*"
+
+  MatillionLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: MatillionJobRunner
+      Handler: matillion_job_runner.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt MatillionLambdaFunctionRole.Arn
+      MemorySize: 128
+      Timeout: 600
+      Code:
+        S3Bucket: 
+          Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
+        S3Key: functions/matillion_job_runner.py
