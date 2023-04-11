@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ELT state machine for running Matillion jobs and Snowflake transformations
 
 Parameters:
-  ProjectName:
-    Type: String
-    Description: 'Project name'
-    Default: 'arch_prj'
+  # ProjectName:
+  #   Type: String
+  #   Description: 'Project name'
+  #   Default: 'arch_prj'
   Environment:
     Type: String
     AllowedValues:
@@ -76,7 +76,7 @@ Resources:
       MemorySize: 128
       Timeout: 600
       Code:
-        S3Bucket: 
+        S3Bucket:
           Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
         S3Key: packages/snow_lambda.zip
 
@@ -130,6 +130,6 @@ Resources:
       MemorySize: 128
       Timeout: 600
       Code:
-        S3Bucket: 
+        S3Bucket:
           Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
         S3Key: functions/matillion_job_runner.py
