@@ -159,6 +159,43 @@ Resources:
         SnowflakeLambdaFunctionArn: !GetAtt SnowflakeLambdaFunction.Arn
       RoleArn: !GetAtt ELTStateMachineExecutionRole.Arn
 
+  SchedulerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+      - PolicyName: SchedulerExecutionPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - states:StartExecution
+            Resource: !GetAtt ELTStateMachine.Arn
+
+  NightlySchedule:
+    Type: 'AWS::Scheduler::Schedule'
+    Properties:
+      Name: DailyAtNight
+      Description: 'Run the job daily at night'
+      ScheduleExpression: 'rate(24 hours)'
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Input: |
+          {
+
+          }
+        Arn: !GetAtt ELTStateMachine.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+
 Outputs:
   MatillionFunction:
     Description: Name of Matillion job runner lambda function
