@@ -184,7 +184,7 @@ jobs:
 
 workflows:
   version: 2
-  my-workflow:
+  generation-workflow:
     jobs:
       - fetch-code
       - build-code:
