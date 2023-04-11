@@ -154,6 +154,9 @@ Resources:
         Bucket:
           Fn::ImportValue: !Join [ '-', [ "fluidmachine", "code-deploy", !Ref Environment ] ]
         Key: ELTStateMachine.asl.json
+      DefinitionSubstitutions:
+        MatillionLambdaFunctionArn: !GetAtt MatillionLambdaFunction.Arn
+        SnowflakeLambdaFunctionArn: !GetAtt SnowflakeLambdaFunction.Arn
       RoleArn: !GetAtt ELTStateMachineExecutionRole.Arn
 
 Outputs:
