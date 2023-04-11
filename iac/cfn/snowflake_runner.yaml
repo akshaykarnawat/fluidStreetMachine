@@ -132,4 +132,4 @@ Resources:
       Code:
         S3Bucket:
           Fn::ImportValue: !Join [ '-', [ "code-deploy-bucket", !Ref Environment ] ]
-        S3Key: functions/matillion_job_runner.py
+        S3Key: packages/snow_lambda.zip
