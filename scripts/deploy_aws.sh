@@ -24,6 +24,21 @@ function get_all_stacks() {
 }
 
 ###############################################################################
+# get_stack_status
+# get stack's satus
+#
+# Returns:
+#   stack_status: status of stack
+#
+###############################################################################
+function get_stack_status() {
+    local stack_name=${1}
+    echo aws cloudformation describe-stacks \
+    --query "Stacks[?contains(StackName,'${stack_name}')].StackStatus" \
+    --output text
+}
+
+###############################################################################
 # describe_stacks
 # search the stacks given the following arguments
 #
@@ -63,6 +78,8 @@ function create_iam() {
             ParameterKey=Users,ParameterValue="" \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region ${AWS_REGION}
+
+        # [[ $(get_stack_status ${stack_name}) != CREATE_COMPLETE ]] && sleep 10
     fi
 
     echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
@@ -173,7 +190,7 @@ function deploy_orchestration() {
         --parameters \
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-            ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
+            # ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
         --region ${AWS_REGION} --capabilities CAPABILITY_IAM
         sleep 30
     fi
