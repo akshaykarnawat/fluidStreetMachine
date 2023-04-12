@@ -179,7 +179,7 @@ function deploy_orchestration() {
     local stack_name=${1}
     local code_deploy_bucket=${2}
     local execution_input=$(echo $(cat "${3}") | tr -d '[ ]')
-    execution_input=$(echo \"${execution_input//\"/\\\"}\")
+    execution_input=$(echo ${execution_input//\"/\\\"})
 
     stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     # if the stack does not exist create it, else update the stack's function
@@ -191,7 +191,13 @@ function deploy_orchestration() {
             ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         --region ${AWS_REGION} --capabilities CAPABILITY_IAM
-        sleep 30
+        sleep 120
+
+        local etl_state_machine_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'ELTStateMachineArn')].OutputValue" text)
+        local schedule_role_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'ScheduleRoleArn')].OutputValue" text)
+
+        aws scheduler update-schedule --name="DailyAtNight-dev" --flexible-time-window="{\"Mode\": \"OFF\"}" --schedule-expression="cron(30 22 ? * * *)" --target="{\"Arn\": \"${etl_state_machine_arn}\", \"RoleArn\": \"${schedule_role_arn}\", \"Input\": \"${execution_input}\" }" --debug
+
     fi
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
 

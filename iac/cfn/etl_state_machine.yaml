@@ -222,7 +222,10 @@ Outputs:
     Value: !Ref SnowflakeLambdaFunction
   ELTStateMachineArn:
     Description: Name of ELT State Machine
-    Value: !Ref ELTStateMachine
+    Value: !GetAtt ELTStateMachine.Arn
+  ScheduleRoleArn:
+    Value: !GetAtt SchedulerRole.Arn
+
   # ExecutionInput:
   #   Description: Sample input to StartExecution.
   #   Value: '{ "timer_seconds": 10 }'
