@@ -161,8 +161,8 @@ function create_data_bucket() {
 function deploy_orchestration() {
     local stack_name=${1}
     local code_deploy_bucket=${2}
-    local execution_input=$(echo $(cat "${3}") | tr '\n' ' ' | tr '\t' ' ')
-    execution_input=$(echo \"${execution_input//\"/\\\"}\")
+    local execution_input=$(echo $(cat "${3}") | tr '\n' ' ')
+    execution_input=$(echo \'${execution_input//\"/\\\"}\')
 
     stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     # if the stack does not exist create it, else update the stack's function
