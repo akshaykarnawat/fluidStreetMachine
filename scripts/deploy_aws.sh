@@ -77,7 +77,7 @@ function create_iam() {
         --parameters \
             ParameterKey=Users,ParameterValue="" \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        --region ${AWS_REGION} capabilities CAPABILITY_NAMED_IAM
+        --region ${AWS_REGION} --capabilities CAPABILITY_NAMED_IAM
 
         # [[ $(get_stack_status ${stack_name}) != CREATE_COMPLETE ]] && sleep 10
     fi
