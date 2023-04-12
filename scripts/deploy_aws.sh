@@ -77,9 +77,9 @@ function create_iam() {
         --parameters \
             ParameterKey=Users,ParameterValue="" \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        --region ${AWS_REGION} --capabilities CAPABILITY_NAMED_IAM
+        --region ${AWS_REGION} #--capabilities CAPABILITY_NAMED_IAM
 
-        # [[ $(get_stack_status ${stack_name}) != CREATE_COMPLETE ]] && sleep 10
+        # [[ $(get_stack_status ${stack_name}) != CREATE_COMPLETE ]] && sleep 30
     fi
 
     echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
@@ -186,13 +186,6 @@ function deploy_orchestration() {
     # if the stack does not exist create it, else update the stack's function
     if [[ ${stack} != ${stack_name} ]]; then
         create_or_update="create-stack"
-        # aws cloudformation create-stack --stack-name ${stack_name} \
-        # --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml \
-        # --parameters \
-        #     ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-        #     ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        #     ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
-        # --region ${AWS_REGION} --capabilities CAPABILITY_IAM
     else
         create_or_update=update-stack
     fi
@@ -204,29 +197,35 @@ function deploy_orchestration() {
         ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
     --region ${AWS_REGION} --capabilities CAPABILITY_IAM
+    sleep 60
 
-        # # update the codebase for both Matillion and Snowflake job
-        # local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'MatillionFunction')].OutputValue" text)
-        # [[ -n matillion_job_function ]] && \
-        # aws lambda update-function-code \
-        # --function-name ${matillion_job_function} \
-        # --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
-        # --s3-key ${SNOW_LAMBDA_KEY}
+    # # update the codebase for both Matillion and Snowflake job
+    # local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'MatillionFunction')].OutputValue" text)
+    # [[ -n matillion_job_function ]] && \
+    # aws lambda update-function-code \
+    # --function-name ${matillion_job_function} \
+    # --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
+    # --s3-key ${SNOW_LAMBDA_KEY}
 
-        # local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'SnowflakeFunction')].OutputValue" text)
-        # [[ -n snowflake_job_function ]] && \
-        # aws lambda update-function-code \
-        # --function-name ${snowflake_job_function} \
-        # --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
-        # --s3-key ${SNOW_LAMBDA_KEY}
+    # local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'SnowflakeFunction')].OutputValue" text)
+    # [[ -n snowflake_job_function ]] && \
+    # aws lambda update-function-code \
+    # --function-name ${snowflake_job_function} \
+    # --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
+    # --s3-key ${SNOW_LAMBDA_KEY}
 
-        # update the execution input for scheduler
-        # local state_machine_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'StateMachineArn')].OutputValue" text)
-        # local schedule_role_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'ScheduleRoleArn')].OutputValue" text)
-        # aws scheduler update-schedule --name="DailyAtNight-dev" \
-        # --flexible-time-window="{\"Mode\": \"OFF\"}" \
-        # --schedule-expression="cron(30 22 ? * * *)" \
-        # --target="{\"Arn\": \"${state_machine_arn}\", \"RoleArn\": \"${schedule_role_arn}\", \"Input\": ${execution_input} }"
+    # # update handler for the lambda function
+    # echo "Updating function's lambda handler"
+    # local handler_name=snowflake_transformation.lambda_handler
+    # aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
+
+    # update the execution input for scheduler
+    # local state_machine_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'StateMachineArn')].OutputValue" text)
+    # local schedule_role_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'ScheduleRoleArn')].OutputValue" text)
+    # aws scheduler update-schedule --name="DailyAtNight-dev" \
+    # --flexible-time-window="{\"Mode\": \"OFF\"}" \
+    # --schedule-expression="cron(30 22 ? * * *)" \
+    # --target="{\"Arn\": \"${state_machine_arn}\", \"RoleArn\": \"${schedule_role_arn}\", \"Input\": ${execution_input} }"
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
 }
 
@@ -261,15 +260,10 @@ function deploy_all() {
     create_data_bucket ${PROJECT_NAME}-s3-bucket-curated-${ENVIRONMENT} Curated
 
     # deploy the clodformation templates for glue job
-    #deploy_glue
+    #deploy_glue #todo
 
     # create step functions, lambda functions, and event bridge from cloudformation template
     deploy_orchestration "generation-data-ELT-state-machine-${ENVIRONMENT}" ${code_deploy_bucket} "./configs/step_functions/ELTStateMachine_input.json"
-
-    # # update handler for the lambda function
-    # echo "Updating function's lambda handler"
-    # local handler_name=snowflake_transformation.lambda_handler
-    # aws lambda update-function-configuration --function-name ${lambda_function} --region ${AWS_REGION} --handler ${handler_name}
 
 }
 

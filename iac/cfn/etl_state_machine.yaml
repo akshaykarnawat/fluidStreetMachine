@@ -205,7 +205,7 @@ Resources:
     Properties:
       Name: !Join [ '-', [ "DailyAtNight", !Ref Environment ] ]
       Description: 'Run the job daily at night'
-      ScheduleExpression: 'cron(30 22 ? * * *)'
+      ScheduleExpression: 'cron(30 8 ? * * *)'
       FlexibleTimeWindow:
         Mode: 'OFF'
       Target:
