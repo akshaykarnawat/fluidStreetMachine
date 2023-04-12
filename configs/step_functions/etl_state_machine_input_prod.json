@@ -1,0 +1,60 @@
+{
+  "matillionWorkflows": [
+    {
+      "matillion_cred_name": "prod/matillion",
+      "group": "GENERATION_DATA_TRANSFORMATION_PROD",
+      "project": "ETL",
+      "version": "default",
+      "job": "pull_GenR_data"
+    },
+    {
+      "matillion_cred_name": "prod/matillion",
+      "group": "GENERATION_DATA_TRANSFORMATION_PROD",
+      "project": "ETL",
+      "version": "default",
+      "job": "pull_Salesforce_data"
+    },
+    {
+      "matillion_cred_name": "prod/matillion",
+      "group": "GENERATION_DATA_TRANSFORMATION_PROD",
+      "project": "ETL",
+      "version": "default",
+      "job": "pull_StaticFiles"
+    }
+  ],
+  "snowflakeTransformations": [
+    {
+      "snowflake_cred_name": "prod/snowflake",
+      "snowflake_warehouse": "PROD_WH",
+      "snowflake_db": "PROD",
+      "snowflake_schema": "STAGING",
+      "bucket": "${code_deploy_bucket}",
+      "key": "databases/snowflake/transformations/data_clean_staging_to_curated.sql",
+      "params": {
+        "DB": "PROD"
+      }
+    },
+    {
+      "snowflake_cred_name": "prod/snowflake",
+      "snowflake_warehouse": "PROD_WH",
+      "snowflake_db": "PROD",
+      "snowflake_schema": "STAGING",
+      "bucket": "${code_deploy_bucket}",
+      "key": "databases/snowflake/transformations/demographics_transformation.sql",
+      "params": {
+        "DB": "PROD"
+      }
+    },
+    {
+      "snowflake_cred_name": "prod/snowflake",
+      "snowflake_warehouse": "PROD_WH",
+      "snowflake_db": "PROD",
+      "snowflake_schema": "STAGING",
+      "bucket": "${code_deploy_bucket}",
+      "key": "databases/snowflake/transformations/extradata_affiliates_transformation.sql",
+      "params": {
+        "DB": "PROD"
+      }
+    }
+  ]
+}

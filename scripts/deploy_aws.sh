@@ -264,7 +264,8 @@ function deploy_all() {
     #deploy_glue #todo
 
     # create step functions, lambda functions, and event bridge from cloudformation template
-    deploy_orchestration "generation-data-ELT-state-machine-${ENVIRONMENT}" ${code_deploy_bucket} "./configs/step_functions/ELTStateMachine_input.json"
+    deploy_orchestration "generation-data-ELT-state-machine-${ENVIRONMENT}" ${code_deploy_bucket} \
+    "./configs/step_functions/etl_state_machine_input_${ENVIRONMENT}.json"
 
 }
 
