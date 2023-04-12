@@ -28,8 +28,8 @@
       "snowflake_warehouse": "DEV_WH",
       "snowflake_db": "DEV",
       "snowflake_schema": "STAGING",
-      "bucket": "generation-arch-prj-code-deploy-ed887a1d",
-      "key": "artifacts/databases/snowflake/transformations/data_clean_staging_to_curated.sql",
+      "bucket": "${code_deploy_bucket}",
+      "key": "databases/snowflake/transformations/data_clean_staging_to_curated.sql",
       "params": {
         "DB": "DEV"
       }
@@ -39,8 +39,8 @@
       "snowflake_warehouse": "DEV_WH",
       "snowflake_db": "DEV",
       "snowflake_schema": "STAGING",
-      "bucket": "generation-arch-prj-code-deploy-ed887a1d",
-      "key": "artifacts/databases/snowflake/transformations/demographics_transformation.sql",
+      "bucket": "${code_deploy_bucket}",
+      "key": "databases/snowflake/transformations/demographics_transformation.sql",
       "params": {
         "DB": "DEV"
       }
@@ -50,8 +50,8 @@
       "snowflake_warehouse": "DEV_WH",
       "snowflake_db": "DEV",
       "snowflake_schema": "STAGING",
-      "bucket": "generation-arch-prj-code-deploy-ed887a1d",
-      "key": "artifacts/databases/snowflake/transformations/extradata_affiliates_transformation.sql",
+      "bucket": "${code_deploy_bucket}",
+      "key": "databases/snowflake/transformations/extradata_affiliates_transformation.sql",
       "params": {
         "DB": "DEV"
       }

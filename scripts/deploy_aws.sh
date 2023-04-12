@@ -179,6 +179,7 @@ function deploy_orchestration() {
     local stack_name=${1}
     local code_deploy_bucket=${2}
     local execution_input=$(echo $(cat "${3}") | tr -d ' ')
+    execution_input=${execution_input//'${code_deploy_bucket}'/${code_deploy_bucket}}
     execution_input=$(echo \"${execution_input//\"/\\\"}\")
     echo Input to the stack is: ${execution_input}
 
