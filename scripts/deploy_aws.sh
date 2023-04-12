@@ -77,7 +77,7 @@ function create_iam() {
         --parameters \
             ParameterKey=Users,ParameterValue="" \
             ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-        --region ${AWS_REGION}
+        --region ${AWS_REGION} capabilities CAPABILITY_NAMED_IAM
 
         # [[ $(get_stack_status ${stack_name}) != CREATE_COMPLETE ]] && sleep 10
     fi
@@ -193,7 +193,7 @@ function deploy_orchestration() {
         #     ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
         #     ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
         # --region ${AWS_REGION} --capabilities CAPABILITY_IAM
-    else 
+    else
         create_or_update=update-stack
     fi
 
