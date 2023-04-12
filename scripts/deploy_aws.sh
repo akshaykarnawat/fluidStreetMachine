@@ -227,7 +227,6 @@ function deploy_orchestration() {
         # --flexible-time-window="{\"Mode\": \"OFF\"}" \
         # --schedule-expression="cron(30 22 ? * * *)" \
         # --target="{\"Arn\": \"${state_machine_arn}\", \"RoleArn\": \"${schedule_role_arn}\", \"Input\": ${execution_input} }"
-    fi
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
 }
 
