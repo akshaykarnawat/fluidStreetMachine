@@ -220,10 +220,11 @@ Outputs:
   SnowflakeFunction:
     Description: Name of Snowflake transformation job lambda function
     Value: !Ref SnowflakeLambdaFunction
-  ELTStateMachineArn:
-    Description: Name of ELT State Machine
+  StateMachineArn:
+    Description: Name of State Machine's ARN
     Value: !GetAtt ELTStateMachine.Arn
   ScheduleRoleArn:
+    Description: Name of Scheduler Arn
     Value: !GetAtt SchedulerRole.Arn
 
   # ExecutionInput:

@@ -180,38 +180,55 @@ function deploy_orchestration() {
     local code_deploy_bucket=${2}
     local execution_input=$(echo $(cat "${3}") | tr -d ' ')
     execution_input=$(echo \"${execution_input//\"/\\\"}\")
+    echo Input to the stack is: ${execution_input}
 
     stack=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackName" text)
     # if the stack does not exist create it, else update the stack's function
     if [[ ${stack} != ${stack_name} ]]; then
-        echo Input to the stack is ${execution_input}
-        aws cloudformation create-stack --stack-name ${stack_name} \
-        --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml \
-        --parameters \
-            ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
-            ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
-            ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
-        --region ${AWS_REGION} --capabilities CAPABILITY_IAM
-        sleep 30
+        create_or_update="create-stack"
+        # aws cloudformation create-stack --stack-name ${stack_name} \
+        # --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml \
+        # --parameters \
+        #     ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
+        #     ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
+        #     ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
+        # --region ${AWS_REGION} --capabilities CAPABILITY_IAM
+    else 
+        create_or_update=update-stack
+    fi
 
-        # local etl_state_machine_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'ELTStateMachineArn')].OutputValue" text)
+    aws cloudformation ${create_or_update} --stack-name ${stack_name} \
+    --template-body file://${TEMPLATE_PATH}/etl_state_machine.yaml \
+    --parameters \
+        ParameterKey=ProjectName,ParameterValue=${PROJECT_NAME} \
+        ParameterKey=Environment,ParameterValue=${ENVIRONMENT} \
+        ParameterKey=ExecutionInput,ParameterValue=${execution_input} \
+    --region ${AWS_REGION} --capabilities CAPABILITY_IAM
+
+        # # update the codebase for both Matillion and Snowflake job
+        # local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'MatillionFunction')].OutputValue" text)
+        # [[ -n matillion_job_function ]] && \
+        # aws lambda update-function-code \
+        # --function-name ${matillion_job_function} \
+        # --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
+        # --s3-key ${SNOW_LAMBDA_KEY}
+
+        # local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'SnowflakeFunction')].OutputValue" text)
+        # [[ -n snowflake_job_function ]] && \
+        # aws lambda update-function-code \
+        # --function-name ${snowflake_job_function} \
+        # --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} \
+        # --s3-key ${SNOW_LAMBDA_KEY}
+
+        # update the execution input for scheduler
+        # local state_machine_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'StateMachineArn')].OutputValue" text)
         # local schedule_role_arn=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'ScheduleRoleArn')].OutputValue" text)
-
-        # aws scheduler update-schedule --name="DailyAtNight-dev" --flexible-time-window="{\"Mode\": \"OFF\"}" --schedule-expression="cron(30 22 ? * * *)" --target="{\"Arn\": \"${etl_state_machine_arn}\", \"RoleArn\": \"${schedule_role_arn}\", \"Input\": \"${execution_input}\" }" --debug
-
+        # aws scheduler update-schedule --name="DailyAtNight-dev" \
+        # --flexible-time-window="{\"Mode\": \"OFF\"}" \
+        # --schedule-expression="cron(30 22 ? * * *)" \
+        # --target="{\"Arn\": \"${state_machine_arn}\", \"RoleArn\": \"${schedule_role_arn}\", \"Input\": ${execution_input} }"
     fi
     # echo $(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].StackId" text)
-
-    # # update the codebase for Matillion job
-    # local matillion_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'MatillionJobRunner')].OutputValue" text)
-    # [[ -n matillion_job_function ]] && \
-    # aws lambda update-function-code --function-name ${matillion_job_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
-
-    # # update the codebase for Snowflake job
-    # local snowflake_job_function=$(describe_stacks "Stacks[?contains(StackName,'${stack_name}')].Outputs[0][?contains(OutputKey, 'SnowflakeRunner')].OutputValue" text)
-    # [[ -n snowflake_job_function ]] && \
-    # aws lambda update-function-code --function-name ${snowflake_job_function} --region ${AWS_REGION} --s3-bucket ${code_deploy_bucket} --s3-key ${SNOW_LAMBDA_KEY}
-
 }
 
 ###############################################################################
